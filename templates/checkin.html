@@ -1,0 +1,7 @@
+<!-- templates/checkin.html -->
+<h2>Check-in</h2>
+<form method="POST" action="/checkin" enctype="multipart/form-data">
+  <label>Upload a current photo as proof you are safe:</label><br>
+  <input type="file" name="checkin_photo" accept="image/*" required><br><br>
+  <button type="submit">Check-in Now</button>
+</form>

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Supporter Approvals{% endblock %}
+
+{% block content %}
+<h2>Pending Supporter Verifications</h2>
+
+{% if supporters %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Username</th>
+        <th>Proof Document</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for supporter in supporters %}
+      <tr>
+        <td>{{ supporter.name }}</td>
+        <td>{{ supporter.username }}</td>
+        <td>
+          {% if supporter.supporter_id_proof %}
+            <a href="{{ url_for('static', filename='proofs/' + supporter.supporter_id_proof) }}" target="_blank">View Proof</a>
+          {% else %}
+            No proof uploaded
+          {% endif %}
+        </td>
+        <td>
+          <form method="post" action="{{ url_for('approve_supporter', user_id=supporter.id) }}">
+            <button type="submit" class="btn btn-success btn-sm">Approve</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>No supporters pending approval.</p>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+        h2, h3 { color: #333; }
+        a { text-decoration: none; color: #0066cc; }
+        a:hover { text-decoration: underline; }
+        img, video { max-width: 200px; border: 1px solid #ccc; margin: 5px 0; border-radius: 6px; }
+        .user-block { background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .alert-warning { color: #b36b00; background: #fff4e5; padding: 10px; border-radius: 5px; font-weight: bold; }
+        .alert-success { color: #2e7d32; background: #d7ffd9; padding: 10px; border-radius: 5px; font-weight: bold; }
+        .media-gallery { margin-top: 10px; }
+        .media-gallery img, .media-gallery video { max-width: 100px; margin: 3px; border-radius: 5px; border: 1px solid #aaa; }
+        .media-label { font-weight: bold; margin-top: 12px; }
+        button { cursor: pointer; padding: 6px 12px; border-radius: 4px; border: none; background-color: #0066cc; color: white; }
+        button:hover { background-color: #004a99; }
+        ul { padding-left: 0; list-style: none; }
+        ul li { margin-bottom: 15px; }
+        .flash-messages { margin-top: 15px; }
+        .flash-messages li { color: green; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Welcome, {{ user.name }}</h2>
+    <h2>Welcome, {{ user.username }}</h2>
+    <p>Trust Score: {{ user.score }}</p>
+    <p>Badge: {{ user.badge }}</p>
+
+    {% if user.user_type == 'supporter' %}
+      <p><strong>Supporter Profile</strong></p>
+      {% if user.verification_status != 'verified' %}
+        <div class="alert-warning">
+          Your supporter ID is not yet verified. Some features may be restricted.
+        </div>
+      {% else %}
+        <div class="alert-success">
+          You are a verified supporter.
+        </div>
+      {% endif %}
+    {% elif user.user_type == 'victim' %}
+      <p><strong>Victim Profile</strong></p>
+    {% endif %}
+
+    <p>
+      <a href="{{ url_for('profile', user_id=user.id) }}">👤 View My Profile</a>
+      <a href="{{ url_for('edit_profile') }}">✏️ Edit Your Profile</a> |
+      <a href="{{ url_for('logout') }}">🚪 Logout</a>
+    </p>
+
+    <p><strong>Last Check-in:</strong> {{ user.last_checkin or "No check-in yet" }}</p>
+
+    {% if user.last_checkin_photo %}
+        <p><strong>Your Last Check-in Photo:</strong></p>
+        <img src="{{ url_for('static', filename='checkins/' + user.last_checkin_photo) }}" alt="Last Check-in Photo" />
+    {% endif %}
+
+    <p><a href="{{ url_for('checkin') }}">🧍 Check-in Now</a></p>
+
+    <hr>
+
+    {% if user.media_filename %}
+        <p><strong>Your Uploaded Proof:</strong></p>
+        {% set ext = user.media_filename.lower().rsplit('.', 1)[-1] %}
+        {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+          <img src="{{ url_for('static', filename='uploads/' + user.media_filename) }}" alt="Uploaded Proof" />
+        {% elif ext in ['mp4', 'webm', 'ogg'] %}
+          <video controls>
+            <source src="{{ url_for('static', filename='uploads/' + user.media_filename) }}" type="video/{{ ext }}">
+            Your browser does not support the video tag.
+          </video>
+        {% else %}
+          <a href="{{ url_for('static', filename='uploads/' + user.media_filename) }}" target="_blank">{{ user.media_filename }}</a>
+        {% endif %}
+    {% else %}
+        <p><em>No proof uploaded yet.</em></p>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('edit_profile') }}" enctype="multipart/form-data" style="margin-top: 15px;">
+        <input type="file" name="file" required>
+        <button type="submit">Upload New Proof</button>
+    </form>
+
+    <hr>
+
+    <h2>Users List</h2>
+    <ul>
+      {% for info in profiles_info %}
+        <li class="user-block">
+          <strong>{{ info.user.name }} ({{ info.user.username }})</strong><br/>
+
+          Protective Markers: {{ info.total_protectors }}<br/>
+
+          Last Check-in: 
+          {% if info.last_checkin %}
+            {{ info.last_checkin.strftime("%Y-%m-%d %H:%M:%S") }}
+          {% else %}
+            Never
+          {% endif %}
+          <br/>
+
+          {% if info.last_checkin_photo %}
+            <img src="{{ url_for('static', filename='checkins/' + info.last_checkin_photo) }}" 
+                 alt="Last Check-in Photo" width="80" />
+          {% endif %}
+          <br/>
+
+          {% if info.missed_checkin %}
+            <span style="color:red; font-weight:bold;">Missed Check-in!</span><br/>
+          {% endif %}
+
+          {% if info.protects %}
+          <form method="POST" action="{{ url_for('unprotect', protected_id=info.user.id) }}">
+          <button type="submit">Unprotect</button>
+          </form>
+           {% else %}
+           <form method="POST" action="{{ url_for('protect', protected_id=info.user.id) }}">
+           <button type="submit">Protect</button>
+           </form>
+           {% endif %}
+           
+           {% if info.media_files %}
+            <div class="media-label">Media Files:</div>
+            <div class="media-gallery">
+              {% for media in info.media_files %}
+                {% set ext = media.filename.lower().rsplit('.', 1)[-1] %}
+                {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+                  <img src="{{ url_for('static', filename='uploads/' + media.filename) }}" alt="Media File">
+                {% elif ext in ['mp4', 'webm', 'ogg'] %}
+                  <video controls>
+                    <source src="{{ url_for('static', filename='uploads/' + media.filename) }}" type="video/{{ ext }}">
+                    Your browser does not support the video tag.
+                  </video>
+                {% else %}
+                  <a href="{{ url_for('static', filename='uploads/' + media.filename) }}" target="_blank">{{ media.filename }}</a>
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% else %}
+            <em>No media uploaded.</em>
+          {% endif %}
+
+          <!-- View Profile button -->
+          <form action="{{ url_for('profile', user_id=info.user.id) }}" method="GET" style="margin-top: 10px;">
+            <button type="submit">View Profile</button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flash-messages">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <style>
+        .flashes li.error { color: red; }
+        .flashes li.success { color: green; }
+    </style>
+</head>
+<body>
+
+    <h2>Register</h2>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Registration form -->
+    <form action="{{ url_for('register') }}" method="POST" enctype="multipart/form-data">
+        <!-- Name -->
+        <label for="name">Name:</label><br>
+        <input type="text" name="name" id="name" required><br><br>
+
+        <!-- Username -->
+        <label for="username">Username:</label><br>
+        <input type="text" name="username" id="username" required><br><br>
+
+        <!-- Email -->
+        <label for="email">Email:</label><br>
+        <input type="email" name="email" id="email" required><br><br>
+
+        <!-- Password -->
+        <label for="password">Password:</label><br>
+        <input type="password" name="password" id="password" required><br><br>
+
+        <!-- User Type -->
+        <label for="user_type">Register as:</label><br>
+        <select id="user_type" name="user_type" required>
+            <option value="victim" selected>Victim</option>
+            <option value="supporter">Supporter</option>
+        </select><br><br>
+
+        <!-- Supporter ID Proof Field -->
+        <div id="supporter_fields" style="display: none;">
+            <label for="supporter_id_proof">Upload Supporter ID Proof:</label><br>
+            <input type="file" id="supporter_id_proof" name="supporter_id_proof" accept="image/*,application/pdf"><br><br>
+        </div>
+
+        <!-- Google reCAPTCHA -->
+        <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div><br>
+
+        <!-- Submit -->
+        <button type="submit">Register</button>
+    </form>
+
+    <!-- Script to toggle supporter fields -->
+    <script>
+        const userTypeSelect = document.getElementById('user_type');
+        const supporterFields = document.getElementById('supporter_fields');
+
+        userTypeSelect.addEventListener('change', () => {
+            supporterFields.style.display = userTypeSelect.value === 'supporter' ? 'block' : 'none';
+        });
+
+        // Ensure correct state on page load
+        userTypeSelect.dispatchEvent(new Event('change'));
+    </script>
+
+</body>
+</html>

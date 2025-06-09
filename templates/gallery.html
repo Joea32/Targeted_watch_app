@@ -1,0 +1,19 @@
+<!-- templates/gallery.html -->
+<h2>{{ user.name }}'s Media Gallery</h2>
+<div class="gallery">
+  {% for media in media_files %}
+    {% if 'image' in media.media_type %}
+      <img src="{{ url_for('serve_media', filename=media.filename) }}" alt="{{ media.original_filename }}" width="200">
+    {% elif 'video' in media.media_type %}
+      <video width="320" height="240" controls>
+        <source src="{{ url_for('serve_media', filename=media.filename) }}" type="{{ media.media_type }}">
+      </video>
+    {% elif 'audio' in media.media_type %}
+      <audio controls>
+        <source src="{{ url_for('serve_media', filename=media.filename) }}" type="{{ media.media_type }}">
+      </audio>
+    {% else %}
+      <a href="{{ url_for('serve_media', filename=media.filename) }}">{{ media.original_filename }}</a>
+    {% endif %}
+  {% endfor %}
+</div>

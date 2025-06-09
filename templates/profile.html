@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>{{ user.name }}'s Profile</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f9f9f9;
+        max-width: 700px;
+        margin: auto;
+      }
+      h1, h3 {
+        color: #333;
+      }
+      .badge-success {
+        background-color: #4CAF50;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.9em;
+        display: inline-block;
+        margin-bottom: 15px;
+      }
+      .profile-pic {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 75px;
+        border: 2px solid #ccc;
+        margin-bottom: 20px;
+      }
+      .user-info p {
+        margin: 8px 0;
+      }
+      .trust-level-trusted {
+        color: green;
+        font-weight: bold;
+      }
+      .trust-level-unverified {
+        color: gray;
+        font-style: italic;
+      }
+      .section-title {
+        margin-top: 30px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 5px;
+      }
+      .media-gallery img, .media-gallery video {
+        max-width: 120px;
+        margin: 8px 8px 8px 0;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+      }
+      a.back-link {
+        display: inline-block;
+        margin-top: 20px;
+        color: #0066cc;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      a.back-link:hover {
+        text-decoration: underline;
+      }
+      .upload-form {
+        margin: 20px 0;
+      }
+      .media-item {
+        display: inline-block;
+        margin: 8px;
+        vertical-align: top;
+      }
+    </style>
+</head>
+<body>
+    <h1>{{ user.name }}'s Profile</h1>
+
+    {% if user.profile_pic %}
+      <img src="{{ url_for('static', filename='uploads/' + user.profile_pic) }}" alt="{{ user.name }}'s Profile Picture" class="profile-pic" />
+    {% else %}
+      <img src="{{ url_for('static', filename='default-profile.png') }}" alt="Default Profile Picture" class="profile-pic" />
+    {% endif %}
+
+    {% if user_is_verified %}
+      <div class="badge-success" aria-label="Verified user badge">Verified</div>
+    {% endif %}
+
+    <div class="user-info">
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p>
+          <strong>Trust Level:</strong> 
+          <span class="{{ 'trust-level-trusted' if user.trusted else 'trust-level-unverified' }}">
+            {{ user.trust_level if user.trust_level else ('Trusted' if user.trusted else 'Unverified') }}
+          </span>
+        </p>
+
+        {% if trust_score is not none %}
+          <p><strong>Trust Score:</strong> {{ trust_score }}</p>
+        {% endif %}
+
+        {% if user.bio %}
+          <div class="section-title"><h3>About</h3></div>
+          <p>{{ user.bio }}</p>
+        {% endif %}
+    </div>
+
+    <div class="section-title"><h3>Activity Summary</h3></div>
+    <p><strong>Check-ins:</strong> {{ user.checkin_count or 0 }}</p>
+    <p><strong>Community Votes:</strong> {{ user.community_votes_count or 0 }}</p>
+    <p><strong>Warnings:</strong> {{ user.warnings_count or 0 }}</p>
+
+    <!-- Upload Form -->
+    <div class="upload-form">
+      <form method="POST" enctype="multipart/form-data" action="{{ url_for('upload_media') }}">
+          <input type="file" name="file" required>
+          <button type="submit">Upload</button>
+      </form>
+    </div>
+
+    {% if user.media_files %}
+      <div class="section-title"><h3>Your Uploaded Media</h3></div>
+      <div class="media-gallery">
+        {% for media in user.media_files %}
+          <div class="media-item">
+            {% if media.media_type in ['image', 'photo'] %}
+              <img src="{{ url_for('serve_media', filename=media.filename) }}" alt="media" width="200">
+            {% elif media.media_type == 'video' %}
+              <video width="320" controls>
+                <source src="{{ url_for('serve_media', filename=media.filename) }}">
+              </video>
+            {% elif media.media_type == 'audio' %}
+              <audio controls>
+                <source src="{{ url_for('serve_media', filename=media.filename) }}">
+              </audio>
+            {% else %}
+              <a href="{{ url_for('serve_media', filename=media.filename) }}" target="_blank">{{ media.original_filename }}</a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
+</body>
+</html>
