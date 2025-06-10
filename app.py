@@ -1021,6 +1021,44 @@ def unban_user():
         return jsonify({"message": f"{username_to_unban} has been unbanned."})
     return jsonify({"error": "User not found."}), 404
 
+
+@app.route('/admin/users')
+@login_required
+def admin_users():
+    if not current_user.is_admin:
+        return "Access denied", 403
+
+    users = User.query.all()
+    return render_template('admin_users.html', users=users)
+
+
+@app.route('/admin/ban/<int:user_id>')
+@login_required
+def ban_user(user_id):
+    if not current_user.is_admin:
+        return "Access denied", 403
+
+    user = User.query.get(user_id)
+    if user:
+        user.is_banned = True
+        db.session.commit()
+        flash(f"{user.username} has been banned.")
+    return redirect(url_for('admin_users'))
+
+
+@app.route('/admin/unban/<int:user_id>')
+@login_required
+def unban_user(user_id):
+    if not current_user.is_admin:
+        return "Access denied", 403
+
+    user = User.query.get(user_id)
+    if user:
+        user.is_banned = False
+        db.session.commit()
+        flash(f"{user.username} has been unbanned.")
+    return redirect(url_for('admin_users'))
+
 # ------------------ RUN APP ------------------------
     
 if __name__ == '__main__':
