@@ -860,6 +860,10 @@ def clear_users():
 
     return f"Deleted {num_deleted} users", 200
 
+@app.route('/num_users')
+def num_users():
+    return str(User.query.count())
+
 # ------------------ RUN APP ------------------------
     
 if __name__ == '__main__':
