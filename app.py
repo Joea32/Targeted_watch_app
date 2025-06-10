@@ -17,7 +17,9 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
 
 from extensions import mail, db, migrate
-from flask_login import LoginManager, login_user, login_required, current_user
+#from flask_login import LoginManager, login_user, login_required, current_user
+from flask_login import login_user, login_required, current_user
+from extensions import login_manager  # ← Use shared instance
 
 from models import User
 from auth import hash_password, check_password
