@@ -838,26 +838,18 @@ def confirm_email(token):
 @app.route('/clear_users', methods=['POST'])
 def clear_users():
     auth_header = request.headers.get('Authorization', '')
+    print(f"Auth header: {auth_header}")  # <--- Add this
     expected_token = os.getenv('CLEAR_USERS_SECRET_KEY')
-
-    print(f"[clear_users] Auth header: {auth_header}, Expected: Bearer {expected_token}")
+    print(f"Expected token: Bearer {expected_token}")  # <--- And this
 
     if auth_header != f"Bearer {expected_token}":
-        print("[clear_users] Unauthorized access attempt!")
-        abort(403)  # Forbidden if token doesn’t match
+        print("Authorization failed")
+        abort(403)
 
-    # Count users before deleting
-    user_count_before = User.query.count()
-    print(f"[clear_users] Users before delete: {user_count_before}")
-
-    # Clear all users
     num_deleted = User.query.delete()
     db.session.commit()
 
-    # Count users after deleting (should be 0)
-    user_count_after = User.query.count()
-    print(f"[clear_users] Users after delete: {user_count_after}")
-
+    print(f"Deleted {num_deleted} users")
     return f"Deleted {num_deleted} users", 200
 
 @app.route('/num_users')
