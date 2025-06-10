@@ -81,9 +81,9 @@ ALLOWED_EXTENSIONS = {
 db.init_app(app)
 migrate.init_app(app, db)
 mail.init_app(app)
-login_manager = login_manager(app)
-login_manager.init_app(app)
-login_manager.login_view = 'login'
+login_manager = LoginManager(app)
+#login_manager.init_app(app)
+#login_manager.login_view = 'login'
 
 # ------------------ Flask-Login User Loader ------------------
 @login_manager.user_loader
