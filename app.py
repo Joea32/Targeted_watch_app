@@ -70,7 +70,8 @@ app.wsgi_app = WhiteNoise(app.wsgi_app, root='static/', prefix='static/')
 # mail.init_app(app)
 
 from flask import Flask
-from flask_login import LoginManager
+#from flask_login import LoginManager
+from extensions import login_manager  # ← FROM EXTENSIONS, NOT NEW ONE
 from models import User, db
 
 # Initialize Flask-Login
