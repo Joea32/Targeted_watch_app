@@ -896,16 +896,26 @@ def confirm_email(token):
 from flask import abort
 from flask_login import current_user
 
-@app.route('/init-db')
-def init_db():
+#@app.route('/init-db')
+#def init_db():
     # OPTIONAL: protect so only logged-in admin can run this
     # Remove this `if` block if you're locked out completely
-    if not current_user.is_authenticated or current_user.user_type != 'admin':
-        abort(403)
+#    if not current_user.is_authenticated or current_user.user_type != 'admin':
+ #       abort(403)
 
-    from yourapp import db  # make sure this import is correct
-    db.create_all()  # this creates all missing tables
-    return "Database tables created!"
+  #  from yourapp import db  # make sure this import is correct
+   # db.create_all()  # this creates all missing tables
+   # return "Database tables created!"
+
+from app import app, db
+
+@app.route('/init-db')
+def init_db():
+    try:
+        db.create_all()
+        return "Database tables created successfully!"
+    except Exception as e:
+        return f"Error creating tables: {e}"
 
 # ------------------ RUN APP ------------------------
     
