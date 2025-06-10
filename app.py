@@ -207,6 +207,12 @@ import requests
 
 from utils import verify_captcha  # Add this import
 
+import os
+
+app = Flask(__name__)
+app.config['RECAPTCHA_SITE_KEY'] = os.getenv('RECAPTCHA_SITE_KEY')
+app.config['RECAPTCHA_SECRET_KEY'] = os.getenv('RECAPTCHA_SECRET_KEY')
+
 @app.route('/register', methods=['GET', 'POST'])
 def register(): 
     
