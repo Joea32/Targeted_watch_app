@@ -1,27 +1,40 @@
-Targeted Victim Watch — A Community Safety App for Targeted Individuals, Activists, and Whistleblowers (work in progress still very all over but main features are there, just some adjustments needed)
-
-Overview
-Targeted Victim Watch is a community-driven safety platform designed to empower and protect vulnerable individuals such as targeted victims (TIs), activists, whistleblowers, and others at risk due to their work, opinions, or identities. This app aims to create a trusted network where people can safely share their status, receive community support, and expose threats through collective vigilance.
-
-Key Features
-	•	Verified Profiles
-Users create profiles verified over time through consistent positive engagement and proof of activism or work (via various media). This longitudinal verification filters out fake or bot accounts, helping ensure that only genuine community members participate. Protective markers—real people who verify their identity—add another layer of trust.
-	•	Safety Check-ins
-Users can regularly update their status to confirm they are safe. To prevent false check-ins by malicious actors, the system may include identity verification measures (e.g., trusted contacts or biometric checks) so the community can reliably know if someone is okay.
-	•	Protective Markers & Community Support
-Community members can show active support by “protective markers” — simple actions that indicate they are watching out for a person’s safety. This visible support network deters attackers and builds public awareness, creating a layer of social accountability.
-	•	Alert System for Silence or Danger
-If a user fails to check in or goes silent, protective markers receive alerts, enabling early intervention or outreach to ensure the user’s safety.
-	•	Community Ownership & Transparency
-The platform is designed to be owned and managed by the community it serves — not corporations or governments. This ensures data privacy, transparency, and that the app stays true to its mission of protection without external interference.
-
-Why Targeted Victim Watch?
-Traditional systems often fail to protect individuals who are targeted because of their activism or whistleblowing, especially in hostile or corrupt environments. Targeted Victim Watch fills this gap by creating a decentralized, peer-supported safety net. It also indirectly exposes perpetrators by documenting patterns of targeting and disappearance, providing evidence to authorities or the public.
-
-Vision
-	•	Foster a trusted community where users can feel seen and protected.
-	•	Use data and social patterns to raise public awareness and question systemic abuses.
-	•	Develop into a social enterprise or cooperative to ensure the app is owned by its users and cannot be hijacked or corrupted.
-	•	Ultimately, provide a new tool to defend human rights, safety, and justice through technology and collective vigilance.
+Targeted Victim Watch — A Community Safety App for Targeted Individuals, Activists, and Whistleblowers
+(Work in progress: core features are implemented, with some fine-tuning pending)
 
 ⸻
+
+Overview
+
+Targeted Victim Watch is a community-driven safety platform designed to empower and protect vulnerable individuals such as targeted victims (TIs), activists, whistleblowers, and others at risk due to their work, opinions, or identities. The app fosters a trusted network where members can safely share their status, receive support, and expose threats through collective vigilance.
+
+While this is a community effort, the original concept and leadership come from the founder to ensure the app remains focused, secure, and true to its mission. Contributions and ideas from the community are welcome and valued — but abuse of trust, attempts to hijack the project, or disruptive behavior will not be tolerated.
+
+⸻
+
+Key Features
+	•	Verified Profiles:
+Users create profiles verified over time through consistent positive engagement and proof of activism or work (e.g., media evidence). This process helps filter out fake or bot accounts, ensuring a genuine community. Protective markers—real people who vouch for others—add a further layer of trust.
+	•	Safety Check-ins:
+Regular status updates confirm user safety. Identity verification measures (trusted contacts, biometrics) help prevent false check-ins, making the system reliable.
+	•	Protective Markers & Community Support:
+Community members show active support via “protective markers” — simple, visible signals indicating they’re watching out for someone’s safety. This creates a deterrent for attackers and raises public awareness.
+	•	Alert System for Silence or Danger:
+If a user fails to check in, protective markers are alerted for early outreach, enabling timely support or intervention.
+	•	Community Ownership & Transparency:
+The platform is designed to be owned and governed by the community—not corporations or governments—ensuring data privacy, transparency, and mission integrity without external interference.
+
+⸻
+
+Why Targeted Victim Watch?
+
+Traditional systems often fail those targeted because of activism or whistleblowing, especially in hostile environments. Targeted Victim Watch fills this gap by building a decentralized, peer-supported safety net. It also documents patterns of targeting and disappearance, providing evidence for authorities and the public.
+
+⸻
+
+Vision
+	•	Foster a trusted community where users feel seen, protected, and empowered.
+	•	Use data and social patterns to raise awareness and challenge systemic abuses.
+	•	Grow into a social enterprise or cooperative, owned by users, immune to corruption or hijacking.
+	•	Provide a technology-based tool to defend human rights, safety, and justice through collective vigilance.
+
+ We welcome contributions and ideas from the community to help improve and grow the project. To keep things positive and on track, please collaborate respectfully and avoid actions that could disrupt the project.
