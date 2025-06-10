@@ -104,7 +104,7 @@ def inject_user():
 app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
 # ------------------ Logging ------------------
-setup_logging()
+setup_logging(app)
 
 # ------------------ Routes ------------------
 @app.route('/')
