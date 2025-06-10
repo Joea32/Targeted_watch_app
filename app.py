@@ -69,6 +69,10 @@ app.wsgi_app = WhiteNoise(app.wsgi_app, root='static/', prefix='static/')
 # If you want to send emails now, uncomment this line:
 # mail.init_app(app)
 
+from flask import Flask
+from flask_login import LoginManager
+from models import User, db
+
 # Initialize Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
