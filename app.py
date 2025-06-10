@@ -835,6 +835,21 @@ def confirm_email(token):
 #    else:
 #        return f"Failed to send email: {response.text}", 500
 
+
+@app.route('/clear_users', methods=['POST'])
+def clear_users():
+    auth_header = request.headers.get('Authorization', '')
+    expected_token = os.getenv('CLEAR_USERS_SECRET_KEY')
+
+    if auth_header != f"Bearer {expected_token}":
+        abort(403)  # Forbidden if token doesn’t match
+
+    # Clear all users
+    num_deleted = User.query.delete()
+    db.session.commit()
+
+    return f"Deleted {num_deleted} users", 200
+
 # ------------------ RUN APP ------------------------
     
 if __name__ == '__main__':
