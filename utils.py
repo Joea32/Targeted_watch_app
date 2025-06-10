@@ -266,6 +266,6 @@ def verify_captcha(response_token):
     result = r.json()
     return result.get("success", False)
 
-def verify_captcha(response_token):
-    # TEMPORARY: Always return True during development
-    return True  # <-- Remember to change this in production!
+#def verify_captcha(response_token):
+#    # TEMPORARY: Always return True during development
+#    return True  # <-- Remember to change this in production!
