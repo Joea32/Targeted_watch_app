@@ -872,6 +872,17 @@ def admin_delete_all_users():
     db.session.commit()
     return f"Deleted {num_deleted} users."
 
+@app.route('/init_db')
+def init_db():
+    # Optional: Protect this route so only admins can run it
+    if not current_user.is_authenticated or current_user.user_type != 'admin':
+        abort(403)  # Forbidden if not logged in as admin
+    
+    from yourapp import db, app  # adjust import if needed
+    with app.app_context():
+        db.create_all()
+    return "Database tables created!"
+
 # ------------------ RUN APP ------------------------
     
 if __name__ == '__main__':
