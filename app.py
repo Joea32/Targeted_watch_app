@@ -893,8 +893,8 @@ def confirm_email(token):
 #    except Exception as e:
 #        return f"Migration failed: {e}"
 
-#from flask import abort
-#from flask_login import current_user
+from flask import abort
+from flask_login import current_user
 
 @app.route('/init-db')
 def init_db():
