@@ -67,6 +67,7 @@ class User(UserMixin,db.Model):
     profile_pic = db.Column(db.String(255), nullable=True)
     badge = db.Column(db.String(50), default='New/Unverified')
     trusted = db.Column(db.Boolean, default=False)
+    is_banned = db.Column(db.Boolean, default=False)
     trust_level = db.Column(db.String(50), default='New/Unverified')
 
     # Negative actions
