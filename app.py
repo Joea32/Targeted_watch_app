@@ -209,7 +209,7 @@ from utils import verify_captcha  # Add this import
 
 @app.route('/register', methods=['GET', 'POST'])
 def register(): 
-    site_key = "6LcIB1srAAAAABkAcaQjoMi7F1a4Lap_ViRtZUwJ"  # Your site key for frontend
+    
     if request.method == 'POST':
         print("[register] POST request received")
 
@@ -279,7 +279,7 @@ def register():
         return redirect(url_for('login'))
 
     print("[register] GET request - showing register page")
-    return render_template('register.html')
+    return render_template('register.html'), recaptcha_site_key=app.config['RECAPTCHA_SITE_KEY'])
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
