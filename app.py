@@ -78,6 +78,12 @@ login_manager.login_view = 'login'  # update if your login route differs
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# Then, define your before_request handler
+@app.before_request
+def block_banned_users():
+    if current_user.is_authenticated and current_user.is_banned and not current_user.is_admin:
+        abort(403)
+
 # Register Blueprints
 from auth_routes import auth as auth_blueprint
 app.register_blueprint(auth_blueprint, url_prefix='/auth')
@@ -935,10 +941,10 @@ def run_migrations():
 from flask import abort
 from flask_login import current_user
 
-@app.before_request
-def block_banned_users():
-    if current_user.is_authenticated and getattr(current_user, 'is_banned', False):
-        abort(403)  # Forbidden access; optionally redirect to a "banned" page
+#@app.before_request
+#def block_banned_users():
+#    if current_user.is_authenticated and getattr(current_user, 'is_banned', False):
+#        abort(403)  # Forbidden access; optionally redirect to a "banned" page
 
 from flask import (
     Flask, render_template, redirect, url_for, request, flash, abort, jsonify
