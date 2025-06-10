@@ -866,22 +866,32 @@ def confirm_email(token):
 #def num_users():
 #    return str(User.query.count())
 
-@app.route('/admin/delete_all_users')
-def admin_delete_all_users():
-    num_deleted = User.query.delete()
-    db.session.commit()
-    return f"Deleted {num_deleted} users."
+#@app.route('/admin/delete_all_users')
+#def admin_delete_all_users():
+#    num_deleted = User.query.delete()
+#    db.session.commit()
+#    return f"Deleted {num_deleted} users."
 
-@app.route('/init_db')
-def init_db():
-    # Optional: Protect this route so only admins can run it
-    if not current_user.is_authenticated or current_user.user_type != 'admin':
-        abort(403)  # Forbidden if not logged in as admin
+#@app.route('/init_db')
+#def init_db():
+#    # Optional: Protect this route so only admins can run it
+#    if not current_user.is_authenticated or current_user.user_type != 'admin':
+#        abort(403)  # Forbidden if not logged in as admin
     
-    from yourapp import db, app  # adjust import if needed
-    with app.app_context():
-        db.create_all()
-    return "Database tables created!"
+#    from yourapp import db, app  # adjust import if needed
+#    with app.app_context():
+#        db.create_all()
+#    return "Database tables created!"
+
+from flask_migrate import upgrade
+
+@app.route('/migrate-db')
+def migrate_db():
+    try:
+        upgrade()  # Applies the latest migrations
+        return "Database migrations applied successfully!"
+    except Exception as e:
+        return f"Migration failed: {e}"
 
 # ------------------ RUN APP ------------------------
     
