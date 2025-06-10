@@ -208,8 +208,7 @@ import requests
 from utils import verify_captcha  # Add this import
 
 @app.route('/register', methods=['GET', 'POST'])
-def register():
-    site_key = "6LcIB1srAAAAABkAcaQjoMi7F1a4Lap_ViRtZUwJ"  # Your site key for frontend
+def register(): 
     if request.method == 'POST':
         print("[register] POST request received")
 
