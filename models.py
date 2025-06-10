@@ -68,6 +68,7 @@ class User(UserMixin,db.Model):
     badge = db.Column(db.String(50), default='New/Unverified')
     trusted = db.Column(db.Boolean, default=False)
     is_banned = db.Column(db.Boolean, default=False)
+    is_admin = db.Column(db.Boolean, default=False)    # your admin flag
     trust_level = db.Column(db.String(50), default='New/Unverified')
 
     # Negative actions
