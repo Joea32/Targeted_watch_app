@@ -920,6 +920,24 @@ def confirm_email(token):
 #    except Exception as e:
 #        return f"Error creating tables: {e}"
 
+from flask_migrate import upgrade
+
+@app.route('/run-migrations')
+def run_migrations():
+    try:
+        upgrade()
+        return "Migrations applied successfully!"
+    except Exception as e:
+        return f"Migration error: {e}"
+
+from flask import abort
+from flask_login import current_user
+
+@app.before_request
+def block_banned_users():
+    if current_user.is_authenticated and getattr(current_user, 'is_banned', False):
+        abort(403)  # Forbidden access; optionally redirect to a "banned" page
+
 # ------------------ RUN APP ------------------------
     
 if __name__ == '__main__':
