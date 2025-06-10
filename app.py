@@ -285,7 +285,7 @@ def register():
         return redirect(url_for('login'))
 
     print("[register] GET request - showing register page")
-    return render_template('register.html'), recaptcha_site_key=app.config['RECAPTCHA_SITE_KEY'])
+    return render_template('register.html', recaptcha_site_key=app.config['RECAPTCHA_SITE_KEY'])
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
