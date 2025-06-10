@@ -107,9 +107,9 @@ app.register_blueprint(auth_blueprint, url_prefix='/auth')
 setup_logging(app)
 
 # ------------------ Routes ------------------
-@app.route('/')
-def index():
-    return render_template('index.html')
+#@app.route('/')
+#def index():
+#    return render_template('index.html')
 
 # ------------------ Run Server ------------------
 if __name__ == '__main__':
