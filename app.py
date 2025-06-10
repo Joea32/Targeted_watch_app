@@ -968,6 +968,59 @@ def admin_users():
     users = User.query.all()
     return render_template('admin_users.html', users=users)
 
+#from flask import abort
+#from flask_login import current_user
+
+@app.before_request
+def block_banned_users():
+    if current_user.is_authenticated and current_user.is_banned and not current_user.is_admin:
+        abort(403)  # or redirect to a banned page
+
+@app.route('/make-admin')
+def make_admin():
+    user = User.query.filter_by(username='Joea99').first()
+    if user:
+        user.is_admin = True
+        db.session.commit()
+        return jsonify({"message": f"{user.username} is now an admin!"})
+    return jsonify({"error": "User not found."}), 404
+
+from flask import request, jsonify
+from flask_login import current_user, login_required
+from models import User, db
+
+@app.route('/ban-user', methods=['POST'])
+@login_required
+def ban_user():
+    if not current_user.is_admin:
+        return jsonify({"error": "Access denied"}), 403
+
+    data = request.get_json()
+    username_to_ban = data.get("username")
+    
+    user = User.query.filter_by(username=username_to_ban).first()
+    if user:
+        user.is_banned = True
+        db.session.commit()
+        return jsonify({"message": f"{username_to_ban} has been banned."})
+    return jsonify({"error": "User not found."}), 404
+
+@app.route('/unban-user', methods=['POST'])
+@login_required
+def unban_user():
+    if not current_user.is_admin:
+        return jsonify({"error": "Access denied"}), 403
+
+    data = request.get_json()
+    username_to_unban = data.get("username")
+
+    user = User.query.filter_by(username=username_to_unban).first()
+    if user:
+        user.is_banned = False
+        db.session.commit()
+        return jsonify({"message": f"{username_to_unban} has been unbanned."})
+    return jsonify({"error": "User not found."}), 404
+
 # ------------------ RUN APP ------------------------
     
 if __name__ == '__main__':
