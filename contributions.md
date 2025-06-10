@@ -12,7 +12,7 @@ Our Expectations
 	•	Contributions should support the mission of creating a safe, trusted community platform.
 	•	Please avoid behavior that disrupts the project or misuses the community trust.
 	•	All contributions must respect users’ privacy and data security.
-	•	We reserve the right to review and approve all contributions to ensure alignment with the project’s goals.
+	•	Reserve the right to review and approve all contributions to ensure alignment with the project’s goals.
 
 Community Guidelines
 	•	Be respectful to all members and their ideas.
