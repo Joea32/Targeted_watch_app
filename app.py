@@ -907,18 +907,18 @@ def confirm_email(token):
    # db.create_all()  # this creates all missing tables
    # return "Database tables created!"
 
-from app import app, db
+#from app import app, db
 
 # Import all models here so SQLAlchemy metadata knows about tables
-from models import User, Media, CheckIn, ProofUpload, Protection, Vote, Alert
+#from models import User, Media, CheckIn, ProofUpload, Protection, Vote, Alert
 
-@app.route('/init-db')
-def init_db():
-    try:
-        db.create_all()
-        return "Database tables created successfully!"
-    except Exception as e:
-        return f"Error creating tables: {e}"
+#@app.route('/init-db')
+#def init_db():
+#    try:
+#        db.create_all()
+#        return "Database tables created successfully!"
+#    except Exception as e:
+#        return f"Error creating tables: {e}"
 
 # ------------------ RUN APP ------------------------
     
