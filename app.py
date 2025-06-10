@@ -1,46 +1,36 @@
+# ------------------ Standard Library ------------------
 import os
 import uuid
-from datetime import datetime, timedelta, timezone, date
+from datetime import timedelta
 from functools import wraps
 
-from extensions import db, migrate, mail
-
-from utils import verify_captcha
-
-
+# ------------------ Third-party Imports ------------------
 from flask import (
     Flask, render_template, redirect, url_for,
     request, session, flash, abort, jsonify, send_from_directory
 )
+from flask_login import login_user, login_required, current_user
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
+from whitenoise import WhiteNoise
+from extensions import db, migrate, mail, login_manager
 
-from extensions import mail, db, migrate
-#from flask_login import LoginManager, login_user, login_required, current_user
-from flask_login import login_user, login_required, current_user
-from extensions import login_manager  # ← Use shared instance
-
+# ------------------ Local Imports ------------------
 from models import User
-from auth import hash_password, check_password
-
+from auth_routes import auth as auth_blueprint
+from logging_config import setup_logging
 from utils import (
-    generate_token, send_email,
+    verify_captcha, generate_token, send_email,
     generate_reset_token, confirm_reset_token,
-    update_user_verification,
-    user_check_in,
-    user_receive_vote,
-    save_file,
-    update_trust_level
+    update_user_verification, user_check_in,
+    user_receive_vote, save_file, update_trust_level
 )
 
-# Load environment variables from .env file
+# ------------------ Load Environment ------------------
 load_dotenv()
 
-from logging_config import setup_logging  # ← ADD THIS LINE
-
-# ------------------ APP INITIALIZATION ------------------
-
+# ------------------ App Initialization ------------------
 app = Flask(__name__)
 
 # Load configuration depending on environment
@@ -50,117 +40,80 @@ if env == 'production':
 else:
     app.config.from_object('config.DevelopmentConfig')
 
-# Optionally set app.secret_key explicitly (usually not necessary if set in config)
+# Secret Key
 app.secret_key = app.config['SECRET_KEY']
 
-# Static/upload folder setup
-app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'static', 'uploads')
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
-app.config['RECAPTCHA_SITE_KEY'] = os.getenv('RECAPTCHA_SITE_KEY')
-app.config['RECAPTCHA_SECRET_KEY'] = os.getenv('RECAPTCHA_SECRET_KEY')
-
-# Serve static files in production using WhiteNoise
-from whitenoise import WhiteNoise
-app.wsgi_app = WhiteNoise(app.wsgi_app, root='static/', prefix='static/')
-
-# Initialize extensions
-#db.init_app(app)
-#migrate.init_app(app, db)
-
-# If you want to send emails now, uncomment this line:
-# mail.init_app(app)
-
-from flask import Flask
-#from flask_login import LoginManager
-from extensions import login_manager  # ← FROM EXTENSIONS, NOT NEW ONE
-from models import User, db
-
-# Initialize Flask-Login
-login_manager = LoginManager()
-login_manager.init_app(app)
-print(f"App has login_manager? {'login_manager' in dir(app)}")
-login_manager.login_view = 'login'  # update if your login route differs
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
-# Then, define your before_request handler
-@app.before_request
-def block_banned_users():
-    if current_user.is_authenticated and current_user.is_banned and not current_user.is_admin:
-        abort(403)
-
-# Register Blueprints
-from auth_routes import auth as auth_blueprint
-app.register_blueprint(auth_blueprint, url_prefix='/auth')
-
-# ---- EMAIL CONFIG (commented out for now if not used) ----
-# app.config['MAIL_SERVER'] = 'smtp.mailgun.org'
-# app.config['MAIL_PORT'] = 587
-# app.config['MAIL_USE_TLS'] = True
-# app.config['MAIL_USERNAME'] = os.getenv('MAILGUN_SMTP_LOGIN')
-# app.config['MAIL_PASSWORD'] = os.getenv('MAILGUN_SMTP_PASSWORD')
-# app.config['MAIL_DEFAULT_SENDER'] = 'you@yourdomain.com'
-
-# Add your routes and other app logic below this line
-
-
-# ------------------ YOUR ROUTES AND LOGIC HERE ------------------
-
-#def verify_captcha(response_token):
-#    secret_key = "6LeKIlkrAAAAAA-rKxgG-d9dhKy2uwX3bdGPuSYO"  # your secret key here
-#    url = "https://www.google.com/recaptcha/api/siteverify"
-#    payload = {
-#        'secret': secret_key,
-#        'response': response_token
-#    }
-#    r = requests.post(url, data=payload)
-#    result = r.json()
-#    return result.get("success", False)
-
-#@app.context_processor
-#def inject_user():
-#    user = None
-#    if 'user_id' in session:
-#        user = User.query.get(session['user_id'])
-#    return dict(user=user)
-
-@app.context_processor
-def inject_user():
-    return dict(user=current_user)
-
+# ------------------ Static and Upload Folder Config ------------------
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-# Upload folders
+app.config['UPLOAD_FOLDER'] = os.path.join(basedir, 'static', 'uploads')
 app.config['UPLOAD_FOLDER_PROFILE'] = os.path.join(basedir, 'static', 'profiles')
 app.config['UPLOAD_FOLDER_PROOF'] = os.path.join(basedir, 'static', 'proofs')
 app.config['UPLOAD_FOLDER_CHECKIN'] = os.path.join(basedir, 'static', 'checkins')
-app.config['UPLOAD_FOLDER_UPLOADS'] = os.path.join(basedir, 'static', 'uploads')
 
-app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 MB max upload size
+# Ensure folders exist
+for folder in [
+    app.config['UPLOAD_FOLDER'],
+    app.config['UPLOAD_FOLDER_PROFILE'],
+    app.config['UPLOAD_FOLDER_PROOF'],
+    app.config['UPLOAD_FOLDER_CHECKIN']
+]:
+    os.makedirs(folder, exist_ok=True)
 
-# Database config
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'db.sqlite3')
-#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# Make sure DATABASE_URL is set in your Render environment variables!
+# ------------------ WhiteNoise and WSGI Middleware ------------------
+app.wsgi_app = WhiteNoise(app.wsgi_app, root='static/', prefix='static/')
+
+# ------------------ App Config ------------------
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
+app.config['RECAPTCHA_SITE_KEY'] = os.getenv('RECAPTCHA_SITE_KEY')
+app.config['RECAPTCHA_SECRET_KEY'] = os.getenv('RECAPTCHA_SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Session lifetime
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
-
-# Allowed file extensions for uploads
+# ------------------ Allowed Upload Extensions ------------------
 ALLOWED_EXTENSIONS = {
     'png', 'jpg', 'jpeg', 'gif', 'pdf',
     'mp4', 'mov', 'avi', 'mkv', 'mp3', 'wav', 'webm'
 }
 
-# ------------------ INIT ---------------------------
-
+# ------------------ Init Extensions ------------------
 db.init_app(app)
 migrate.init_app(app, db)
+mail.init_app(app)
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+# ------------------ Flask-Login User Loader ------------------
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# ------------------ Before Request Handlers ------------------
+@app.before_request
+def block_banned_users():
+    if current_user.is_authenticated and current_user.is_banned and not current_user.is_admin:
+        abort(403)
+
+# ------------------ Context Processor ------------------
+@app.context_processor
+def inject_user():
+    return dict(user=current_user)
+
+# ------------------ Register Blueprints ------------------
+app.register_blueprint(auth_blueprint, url_prefix='/auth')
+
+# ------------------ Logging ------------------
+setup_logging()
+
+# ------------------ Routes ------------------
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+# ------------------ Run Server ------------------
+if __name__ == '__main__':
+    app.run()
 # ------------------ ERROR HANDLERS -----------------
 
 @app.errorhandler(RequestEntityTooLarge)
