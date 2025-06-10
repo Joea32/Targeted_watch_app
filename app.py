@@ -938,6 +938,36 @@ def block_banned_users():
     if current_user.is_authenticated and getattr(current_user, 'is_banned', False):
         abort(403)  # Forbidden access; optionally redirect to a "banned" page
 
+from flask import render_template, redirect, url_for, request, flash
+from models import User
+#from extensions import db
+from flask_login import login_required
+from utils import admin_required
+
+@app.route('/admin/users', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def admin_users():
+    if request.method == 'POST':
+        user_id = request.form.get('user_id')
+        action = request.form.get('action')
+
+        user = User.query.get(user_id)
+        if user:
+            if action == 'ban':
+                user.is_banned = True
+            elif action == 'unban':
+                user.is_banned = False
+            db.session.commit()
+            flash(f"User {user.username} updated.", "success")
+        else:
+            flash("User not found.", "danger")
+
+        return redirect(url_for('admin_users'))
+
+    users = User.query.all()
+    return render_template('admin_users.html', users=users)
+
 # ------------------ RUN APP ------------------------
     
 if __name__ == '__main__':
