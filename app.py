@@ -930,6 +930,8 @@ def run_migrations():
     except Exception as e:
         return f"Migration error: {e}"
 
+######
+
 from flask import abort
 from flask_login import current_user
 
@@ -938,12 +940,23 @@ def block_banned_users():
     if current_user.is_authenticated and getattr(current_user, 'is_banned', False):
         abort(403)  # Forbidden access; optionally redirect to a "banned" page
 
-from flask import render_template, redirect, url_for, request, flash
-from models import User
-#from extensions import db
-from flask_login import login_required
-from utils import admin_required
+from flask import (
+    Flask, render_template, redirect, url_for, request, flash, abort, jsonify
+)
+from flask_login import login_required, current_user
+from werkzeug.security import generate_password_hash
+from models import User, db
+from utils import admin_required  # assuming you have this decorator
 
+app = Flask(__name__)
+
+# --- Block banned users (non-admins) from accessing any route ---
+@app.before_request
+def block_banned_users():
+    if current_user.is_authenticated and current_user.is_banned and not current_user.is_admin:
+        abort(403)  # Forbidden
+
+# --- Admin user management page (GET shows users, POST handles ban/unban) ---
 @app.route('/admin/users', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -953,124 +966,98 @@ def admin_users():
         action = request.form.get('action')
 
         user = User.query.get(user_id)
-        if user:
-            if action == 'ban':
-                user.is_banned = True
-            elif action == 'unban':
-                user.is_banned = False
-            db.session.commit()
-            flash(f"User {user.username} updated.", "success")
-        else:
+        if not user:
             flash("User not found.", "danger")
+            return redirect(url_for('admin_users'))
 
+        if action == 'ban':
+            user.is_banned = True
+            flash(f"User {user.username} has been banned.", "success")
+        elif action == 'unban':
+            user.is_banned = False
+            flash(f"User {user.username} has been unbanned.", "success")
+        else:
+            flash("Invalid action.", "danger")
+
+        db.session.commit()
         return redirect(url_for('admin_users'))
 
     users = User.query.all()
     return render_template('admin_users.html', users=users)
 
-#from flask import abort
-#from flask_login import current_user
-
-@app.before_request
-def block_banned_users():
-    if current_user.is_authenticated and current_user.is_banned and not current_user.is_admin:
-        abort(403)  # or redirect to a banned page
-
-@app.route('/make-admin')
-def make_admin():
-    user = User.query.filter_by(username='Joea99').first()
-    if user:
-        user.is_admin = True
-        db.session.commit()
-        return jsonify({"message": f"{user.username} is now an admin!"})
-    return jsonify({"error": "User not found."}), 404
-
-from flask import request, jsonify
-from flask_login import current_user, login_required
-from models import User, db
-
-@app.route('/ban-user', methods=['POST'])
+# --- Password reset for any user (admin only) ---
+@app.route('/admin/reset-password', methods=['POST'])
 @login_required
-def ban_user():
-    if not current_user.is_admin:
-        return jsonify({"error": "Access denied"}), 403
+@admin_required
+def reset_password():
+    username = request.form.get('username')
+    new_password = request.form.get('new_password')
 
-    data = request.get_json()
-    username_to_ban = data.get("username")
-    
-    user = User.query.filter_by(username=username_to_ban).first()
-    if user:
-        user.is_banned = True
-        db.session.commit()
-        return jsonify({"message": f"{username_to_ban} has been banned."})
-    return jsonify({"error": "User not found."}), 404
+    if not username or not new_password:
+        flash("Username and new password are required.", "danger")
+        return redirect(url_for('admin_users'))
 
-@app.route('/unban-user', methods=['POST'])
-@login_required
-def unban_user():
-    if not current_user.is_admin:
-        return jsonify({"error": "Access denied"}), 403
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        flash("User not found.", "danger")
+        return redirect(url_for('admin_users'))
 
-    data = request.get_json()
-    username_to_unban = data.get("username")
-
-    user = User.query.filter_by(username=username_to_unban).first()
-    if user:
-        user.is_banned = False
-        db.session.commit()
-        return jsonify({"message": f"{username_to_unban} has been unbanned."})
-    return jsonify({"error": "User not found."}), 404
-
-
-@app.route('/admin/users')
-@login_required
-def admin_users():
-    if not current_user.is_admin:
-        return "Access denied", 403
-
-    users = User.query.all()
-    return render_template('admin_users.html', users=users)
-
-
-@app.route('/admin/ban/<int:user_id>')
-@login_required
-def ban_user(user_id):
-    if not current_user.is_admin:
-        return "Access denied", 403
-
-    user = User.query.get(user_id)
-    if user:
-        user.is_banned = True
-        db.session.commit()
-        flash(f"{user.username} has been banned.")
+    user.password = generate_password_hash(new_password)
+    db.session.commit()
+    flash(f"Password for {user.username} has been reset.", "success")
     return redirect(url_for('admin_users'))
 
-
-@app.route('/admin/unban/<int:user_id>')
+# --- Optional: Create new admin user (admin only) ---
+@app.route('/admin/create-admin', methods=['POST'])
 @login_required
-def unban_user(user_id):
-    if not current_user.is_admin:
-        return "Access denied", 403
+@admin_required
+def create_admin():
+    username = request.form.get('username')
+    password = request.form.get('password')
 
-    user = User.query.get(user_id)
-    if user:
-        user.is_banned = False
-        db.session.commit()
-        flash(f"{user.username} has been unbanned.")
-    return redirect(url_for('admin_users'))
+    if not username or not password:
+        return jsonify({"error": "Username and password required."}), 400
 
-from werkzeug.security import generate_password_hash
-from models import User, db
+    if User.query.filter_by(username=username).first():
+        return jsonify({"error": "User already exists."}), 400
 
-@app.route('/reset-admin-password')
-def reset_admin_password():
-    user = User.query.filter_by(username='Joea99').first()
-    if user:
-        user.password = generate_password_hash('NewStrongPassword123')
-        db.session.commit()
-        return f"Password reset for {user.username}!"
-    return "User not found.", 404
+    hashed_password = generate_password_hash(password)
+    new_admin = User(username=username, password=hashed_password, is_admin=True)
+    db.session.add(new_admin)
+    db.session.commit()
 
+    return jsonify({"message": f"Admin user '{username}' created successfully."}), 201
+
+# --- Optional API ban/unban endpoints for AJAX or API usage ---
+@app.route('/admin/ban-user', methods=['POST'])
+@login_required
+@admin_required
+def ban_user_api():
+    data = request.get_json()
+    username = data.get("username")
+
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({"error": "User not found."}), 404
+
+    user.is_banned = True
+    db.session.commit()
+    return jsonify({"message": f"{username} has been banned."})
+
+@app.route('/admin/unban-user', methods=['POST'])
+@login_required
+@admin_required
+def unban_user_api():
+    data = request.get_json()
+    username = data.get("username")
+
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({"error": "User not found."}), 404
+
+    user.is_banned = False
+    db.session.commit()
+    return jsonify({"message": f"{username} has been unbanned."})
 # ------------------ RUN APP ------------------------
     
 if __name__ == '__main__':
