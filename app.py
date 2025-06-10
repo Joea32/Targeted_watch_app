@@ -835,26 +835,26 @@ def confirm_email(token):
 #    else:
 #        return f"Failed to send email: {response.text}", 500
 
-@app.route('/clear_users', methods=['POST'])
-def clear_users():
-    auth_header = request.headers.get('Authorization', '')
-    print(f"Auth header: {auth_header}")  # <--- Add this
-    expected_token = os.getenv('CLEAR_USERS_SECRET_KEY')
-    print(f"Expected token: Bearer {expected_token}")  # <--- And this
+#@app.route('/clear_users', methods=['POST'])
+#def clear_users():
+#    auth_header = request.headers.get('Authorization', '')
+#    print(f"Auth header: {auth_header}")  # <--- Add this
+#    expected_token = os.getenv('CLEAR_USERS_SECRET_KEY')
+#    print(f"Expected token: Bearer {expected_token}")  # <--- And this
 
-    if auth_header != f"Bearer {expected_token}":
-        print("Authorization failed")
-        abort(403)
+#    if auth_header != f"Bearer {expected_token}":
+#        print("Authorization failed")
+#        abort(403)
 
-    num_deleted = User.query.delete()
-    db.session.commit()
+#    num_deleted = User.query.delete()
+#    db.session.commit()
 
-    print(f"Deleted {num_deleted} users")
-    return f"Deleted {num_deleted} users", 200
+#    print(f"Deleted {num_deleted} users")
+#    return f"Deleted {num_deleted} users", 200
 
-@app.route('/num_users')
-def num_users():
-    return str(User.query.count())
+#@app.route('/num_users')
+#def num_users():
+#    return str(User.query.count())
 
 # ------------------ RUN APP ------------------------
     
