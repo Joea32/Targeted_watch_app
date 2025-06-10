@@ -334,8 +334,15 @@ from flask_login import current_user
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    user = current_user  # use flask-login's current_user
+    #user = current_user  # use flask-login's current_user
+    #if not user:
+    #    flash("User not found. Please log in again.", "warning")
+    #    return redirect(url_for('login'))
+
+     # Re-query user from DB to verify existence
+    user = User.query.get(current_user.id)
     if not user:
+        logout_user()
         flash("User not found. Please log in again.", "warning")
         return redirect(url_for('login'))
 
