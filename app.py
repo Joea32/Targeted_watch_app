@@ -1059,6 +1059,18 @@ def unban_user(user_id):
         flash(f"{user.username} has been unbanned.")
     return redirect(url_for('admin_users'))
 
+from werkzeug.security import generate_password_hash
+from models import User, db
+
+@app.route('/reset-admin-password')
+def reset_admin_password():
+    user = User.query.filter_by(username='Joea99').first()
+    if user:
+        user.password = generate_password_hash('NewStrongPassword123')
+        db.session.commit()
+        return f"Password reset for {user.username}!"
+    return "User not found.", 404
+
 # ------------------ RUN APP ------------------------
     
 if __name__ == '__main__':
