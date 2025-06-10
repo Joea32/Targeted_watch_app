@@ -883,15 +883,29 @@ def confirm_email(token):
 #        db.create_all()
 #    return "Database tables created!"
 
-from flask_migrate import upgrade
+#from flask_migrate import upgrade
 
-@app.route('/migrate-db')
-def migrate_db():
-    try:
-        upgrade()  # Applies the latest migrations
-        return "Database migrations applied successfully!"
-    except Exception as e:
-        return f"Migration failed: {e}"
+#@app.route('/migrate-db')
+#def migrate_db():
+#    try:
+#        upgrade()  # Applies the latest migrations
+#        return "Database migrations applied successfully!"
+#    except Exception as e:
+#        return f"Migration failed: {e}"
+
+#from flask import abort
+#from flask_login import current_user
+
+@app.route('/init-db')
+def init_db():
+    # OPTIONAL: protect so only logged-in admin can run this
+    # Remove this `if` block if you're locked out completely
+    if not current_user.is_authenticated or current_user.user_type != 'admin':
+        abort(403)
+
+    from yourapp import db  # make sure this import is correct
+    db.create_all()  # this creates all missing tables
+    return "Database tables created!"
 
 # ------------------ RUN APP ------------------------
     
