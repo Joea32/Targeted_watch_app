@@ -76,6 +76,7 @@ from models import User, db
 # Initialize Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
+print(f"App has login_manager? {'login_manager' in dir(app)}")
 login_manager.login_view = 'login'  # update if your login route differs
 
 @login_manager.user_loader
