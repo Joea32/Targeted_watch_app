@@ -55,6 +55,10 @@ app.secret_key = app.config['SECRET_KEY']
 app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'static', 'uploads')
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
+app = Flask(__name__)
+app.config['RECAPTCHA_SITE_KEY'] = os.getenv('RECAPTCHA_SITE_KEY')
+app.config['RECAPTCHA_SECRET_KEY'] = os.getenv('RECAPTCHA_SECRET_KEY')
+
 # Serve static files in production using WhiteNoise
 from whitenoise import WhiteNoise
 app.wsgi_app = WhiteNoise(app.wsgi_app, root='static/', prefix='static/')
@@ -208,10 +212,6 @@ import requests
 from utils import verify_captcha  # Add this import
 
 import os
-
-app = Flask(__name__)
-app.config['RECAPTCHA_SITE_KEY'] = os.getenv('RECAPTCHA_SITE_KEY')
-app.config['RECAPTCHA_SECRET_KEY'] = os.getenv('RECAPTCHA_SECRET_KEY')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register(): 
