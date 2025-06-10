@@ -37,6 +37,21 @@
   </tbody>
 </table>
 
+<hr>
+
+<h2>Reset User Password</h2>
+<form method="POST" action="{{ url_for('reset_password') }}">
+  <label>Username:
+    <input type="text" name="username" required>
+  </label>
+  <label>New Password:
+    <input type="password" name="new_password" required>
+  </label>
+  <button type="submit">Reset Password</button>
+</form>
+
+<hr>
+
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     <ul>
