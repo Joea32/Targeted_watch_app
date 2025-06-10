@@ -1,4 +1,4 @@
-Targeted Victim Watch — A Community Safety App for Targeted Individuals, Activists, and Whistleblowers
+Targeted Victim Watch — A Community Safety App for Targeted Individuals, Activists, and Whistleblowers (work in progress still very all over but main features are there, just some adjustments needed)
 
 Overview
 Targeted Victim Watch is a community-driven safety platform designed to empower and protect vulnerable individuals such as targeted victims (TIs), activists, whistleblowers, and others at risk due to their work, opinions, or identities. This app aims to create a trusted network where people can safely share their status, receive community support, and expose threats through collective vigilance.
