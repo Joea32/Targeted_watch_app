@@ -893,8 +893,8 @@ def confirm_email(token):
 #    except Exception as e:
 #        return f"Migration failed: {e}"
 
-from flask import abort
-from flask_login import current_user
+#from flask import abort
+#from flask_login import current_user
 
 #@app.route('/init-db')
 #def init_db():
@@ -908,6 +908,9 @@ from flask_login import current_user
    # return "Database tables created!"
 
 from app import app, db
+
+# Import all models here so SQLAlchemy metadata knows about tables
+from models import User, Media, CheckIn, ProofUpload, Protection, Vote, Alert
 
 @app.route('/init-db')
 def init_db():
