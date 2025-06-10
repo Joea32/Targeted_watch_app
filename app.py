@@ -856,6 +856,13 @@ def confirm_email(token):
 #def num_users():
 #    return str(User.query.count())
 
+@app.route('/admin/delete_all_users')
+def admin_delete_all_users():
+    # Optional: Add some basic auth or IP check here
+    num_deleted = User.query.delete()
+    db.session.commit()
+    return f"Deleted {num_deleted} users."
+
 # ------------------ RUN APP ------------------------
     
 if __name__ == '__main__':
