@@ -37,4 +37,4 @@ Vision
 	•	Grow into a social enterprise or cooperative, owned by users, immune to corruption or hijacking.
 	•	Provide a technology-based tool to defend human rights, safety, and justice through collective vigilance.
 
- We welcome contributions and ideas from the community to help improve and grow the project. To keep things positive and on track, please collaborate respectfully and avoid actions that could disrupt the project.
+ Welcome contributions and ideas from the community to help improve and grow the project. To keep things positive and on track, please collaborate respectfully and avoid actions that could disrupt the project.
