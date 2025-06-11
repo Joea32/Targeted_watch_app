@@ -737,7 +737,7 @@ def reset_password_token(token):
 
 
 
-auth = Blueprint('auth', __name__)
+#auth = Blueprint('auth', __name__)
 
 @auth.route('/confirm/<token>')
 def confirm_email(token):
