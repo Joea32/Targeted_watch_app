@@ -1030,6 +1030,64 @@ def unban_user_api():
     user.is_banned = False
     db.session.commit()
     return jsonify({"message": f"{username} has been unbanned."})
+
+@app.route('/')
+def home():
+    return "Hello! Use /migrate to add missing columns."
+
+from sqlalchemy import inspect
+
+@app.route('/migrate')
+def migrate():
+    try:
+        inspector = inspect(db.engine)
+        columns = [col['name'] for col in inspector.get_columns('users')]
+
+        with db.engine.connect() as con:
+            if 'score' not in columns:
+                con.execute("ALTER TABLE users ADD COLUMN score INTEGER DEFAULT 0;")
+            if 'trust_points' not in columns:
+                con.execute("ALTER TABLE users ADD COLUMN trust_points INTEGER DEFAULT 0;")
+            if 'trust_score' not in columns:
+                con.execute("ALTER TABLE users ADD COLUMN trust_score FLOAT DEFAULT 0.0;")
+            if 'checkin_count' not in columns:
+                con.execute("ALTER TABLE users ADD COLUMN checkin_count INTEGER DEFAULT 0;")
+            if 'proof_upload_count' not in columns:
+                con.execute("ALTER TABLE users ADD COLUMN proof_upload_count INTEGER DEFAULT 0;")
+            if 'community_votes_count' not in columns:
+                con.execute("ALTER TABLE users ADD COLUMN community_votes_count INTEGER DEFAULT 0;")
+            if 'badge' not in columns:
+                con.execute("ALTER TABLE users ADD COLUMN badge VARCHAR(50) DEFAULT 'New/Unverified';")
+            if 'trusted' not in columns:
+                con.execute("ALTER TABLE users ADD COLUMN trusted BOOLEAN DEFAULT FALSE;")
+            if 'is_banned' not in columns:
+                con.execute("ALTER TABLE users ADD COLUMN is_banned BOOLEAN DEFAULT FALSE;")
+            if 'is_admin' not in columns:
+                con.execute("ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE;")
+            if 'trust_level' not in columns:
+                con.execute("ALTER TABLE users ADD COLUMN trust_level VARCHAR(50) DEFAULT 'New/Unverified';")
+            if 'negative_action_count' not in columns:
+                con.execute("ALTER TABLE users ADD COLUMN negative_action_count INTEGER DEFAULT 0;")
+            if 'warnings_count' not in columns:
+                con.execute("ALTER TABLE users ADD COLUMN warnings_count INTEGER DEFAULT 0;")
+            if 'negative_marks' not in columns:
+                con.execute("ALTER TABLE users ADD COLUMN negative_marks INTEGER DEFAULT 0;")
+            if 'user_type' not in columns:
+                con.execute("ALTER TABLE users ADD COLUMN user_type VARCHAR(50) DEFAULT 'victim' NOT NULL;")
+            if 'is_verified_supporter' not in columns:
+                con.execute("ALTER TABLE users ADD COLUMN is_verified_supporter BOOLEAN DEFAULT FALSE;")
+            if 'verification_status' not in columns:
+                con.execute("ALTER TABLE users ADD COLUMN verification_status VARCHAR(50) DEFAULT 'unverified';")
+            if 'verified' not in columns:
+                con.execute("ALTER TABLE users ADD COLUMN verified BOOLEAN DEFAULT FALSE;")
+
+        return "Migration successful: Missing columns added."
+    except Exception as e:
+        return f"Migration error: {str(e)}", 500
+
+with app.app_context():
+    db.create_all()
+
 # ------------------ RUN APP ------------------------
     
 if __name__ == '__main__':
