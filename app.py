@@ -1043,7 +1043,7 @@ from models import User  # adjust as needed
 
 migrate_bp = Blueprint('migrate', __name__)
 
-@migrate_bp.route('/run-full-migration', methods=['POST'])
+@migrate_bp.route('/run-full-migration', methods=['GET', 'POST'])
 def run_full_migration():
     with db.engine.connect() as connection:
         for column in [
