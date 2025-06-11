@@ -1032,11 +1032,12 @@ def create_initial_admin():
         new_admin = User(username=username, password=hashed_password, is_admin=True)
         db.session.add(new_admin)
         db.session.commit()
-        
-        # Redirect to login or wherever after creation
-        return redirect(url_for('login'))  # or 'auth.login' if your login route is in the auth blueprint
 
-    return render_template("create_initial_admin.html")
+        # Redirect to login page after successful admin creation
+        return redirect(url_for('login'))
+
+    # GET request shows the form
+    return render_template("create_admin.html")  # your existing form template
 
 
 
