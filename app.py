@@ -35,7 +35,17 @@ from token_utils import confirm_token
 load_dotenv()
 
 # ------------------ App Initialization ------------------
+
+from flask import Flask, render_template, redirect, url_for, request, session, flash, abort, jsonify, send_from_directory
+#from flask_login import login_user, login_required, current_user
+from werkzeug.utils import secure_filename
+from werkzeug.exceptions import RequestEntityTooLarge
+
 app = Flask(__name__)
+
+# ------------------ Blueprint Registration ------------------
+from auth_routes import auth as auth_blueprint
+app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
 # Load config based on environment
 env = os.environ.get('FLASK_ENV', 'development')
