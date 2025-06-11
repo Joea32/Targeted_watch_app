@@ -111,7 +111,7 @@ def inject_user():
     return dict(user=current_user)
 
 # ------------------ Register Blueprints ------------------
-app.register_blueprint(auth_blueprint, url_prefix='/auth')
+#app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
 # ------------------ Logging ------------------
 setup_logging(app)
