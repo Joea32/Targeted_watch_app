@@ -1047,9 +1047,9 @@ def create_initial_admin_two():
 
 @app.route('/create-initial-admin', methods=['GET', 'POST'])
 def create_initial_admin():
-    #secret_key = request.args.get('key')
-    #if secret_key != 'Asdfert2345ghyuihef':
-    #    abort(403)
+    secret_key = request.args.get('key')
+    if secret_key != 'Fedfnewfnwfgwbi23dqq':
+        abort(403)
 
     if request.method == 'POST':
         username = request.form.get('username')
@@ -1066,32 +1066,9 @@ def create_initial_admin():
         new_admin = User(
             name="Admin User",
             username=username,
-            email=None,                # nullable
+            email=None,
             password=hashed_password,
-            badge="New/Unverified",    # default in model but explicit here for clarity
-            trusted=False,
-            is_banned=False,
-            is_admin=True,             # make admin!
-            trust_level="New/Unverified",
-            user_type="victim",        # default
-            verification_status="unverified",  # default
-            verified=False,
-            checkin_count=0,
-            proof_upload_count=0,
-            community_votes_count=0,
-            score=0,
-            trust_points=0,
-            trust_score=0.0,
-            negative_action_count=0,
-            warnings_count=0,
-            negative_marks=0,
-            last_checkin=None,
-            _bio=None,
-            profile_pic=None,
-            proof_file=None,
-            last_checkin_photo=None,
-            is_verified_supporter=False,
-            _supporter_id_proof=None,
+            is_admin=True
         )
 
         db.session.add(new_admin)
