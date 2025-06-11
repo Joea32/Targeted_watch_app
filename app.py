@@ -737,27 +737,27 @@ def reset_password_token(token):
 
 
 
-@auth.route('/confirm/<token>')
-def confirm_email(token):
-    email = confirm_token(token)
-    if not email:
-        flash('The confirmation link is invalid or has expired.', 'danger')
-        return redirect(url_for('auth.login'))
+#@auth.route('/confirm/<token>')
+#def confirm_email(token):
+#    email = confirm_token(token)
+#    if not email:
+#        flash('The confirmation link is invalid or has expired.', 'danger')
+#        return redirect(url_for('auth.login'))
 
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        flash('User not found.', 'danger')
-        return redirect(url_for('auth.login'))
+#    user = User.query.filter_by(email=email).first()
+#    if not user:
+#        flash('User not found.', 'danger')
+#        return redirect(url_for('auth.login'))
 
-    if user.verified:
-        flash('Account already confirmed. Please login.', 'success')
-    else:
-        user.verified = True
-        user.verification_status = 'verified'
-        db.session.commit()
-        flash('You have confirmed your account. Thanks!', 'success')
+#    if user.verified:
+#        flash('Account already confirmed. Please login.', 'success')
+#    else:
+#        user.verified = True
+#        user.verification_status = 'verified'
+#        db.session.commit()
+#        flash('You have confirmed your account. Thanks!', 'success')
 
-    return redirect(url_for('auth.login'))
+#    return redirect(url_for('auth.login'))
 
 #auth = Blueprint('auth', __name__)
 
