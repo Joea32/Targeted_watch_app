@@ -18,6 +18,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
 from dotenv import load_dotenv
 from whitenoise import WhiteNoise
+from werkzeug.security import generate_password_hash
 
 # ------------------ Local Imports ------------------
 from extensions import db, migrate, mail, login_manager
