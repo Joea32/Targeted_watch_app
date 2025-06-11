@@ -890,22 +890,6 @@ def reset_password_token(token):
 
 
 
-@app.route('/make-migration')
-def make_migration():
-    try:
-        flask_migrate_migrate(message="Auto migration from route")
-        return "Migration script generated!"
-    except Exception as e:
-        return f"Migration generation error: {e}"
-
-@app.route('/run-migrations')
-def run_migrations():
-    try:
-        upgrade()
-        return "Migrations applied successfully!"
-    except Exception as e:
-        return f"Migration error: {e}"
-
 ######
 
 #from flask import abort
