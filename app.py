@@ -1044,7 +1044,7 @@ def create_initial_admin():
 def create_admin():
     # Protect the route with a simple password token
     token = request.args.get("token")
-    if token != "your-secret-token-here":
+    if token != "ATUE_ChangePw_#2024!secureTOKEN":
         abort(403)  # Forbidden
 
     # Check if admin already exists
@@ -1052,7 +1052,7 @@ def create_admin():
     if existing_admin:
         return "Admin already exists."
 
-    password = "YourSecurePasswordHere"  # TEMPORARY — change it before deploying
+    password = "Atueman31"  # TEMPORARY — change it before deploying
     hashed_password = generate_password_hash(password)
 
     admin = User(
