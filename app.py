@@ -191,6 +191,8 @@ import requests
 
 from utils import verify_captcha  # Add this import
 
+from auth import hash_password
+
 #import os
 
 @app.route('/register', methods=['GET', 'POST'])
