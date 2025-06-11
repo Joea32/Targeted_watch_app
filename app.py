@@ -1170,28 +1170,6 @@ def login_logic_test_2():
 #from yourapp import app, db  # adjust 'yourapp' if needed
 #from yourapp.models import User  # adjust import to match your structure
 
-@app.route('/admin-bootstrap-temp', methods=['GET'])
-def admin_bootstrap_temp():
-    # Prevent access if an admin already exists
-    if User.query.filter_by(is_admin=True).first():
-        return "Admin already exists. Route disabled for security.", 403
-
-    # Get credentials from query parameters
-    username = request.args.get('username')
-    email = request.args.get('email')
-    password = request.args.get('password')
-
-    if not username or not email or not password:
-        return "Missing required fields: username, email, or password.", 400
-
-    # Create the admin user
-    hashed_password = generate_password_hash(password)
-    new_admin = User(username=username, email=email, password=hashed_password, is_admin=True)
-
-    db.session.add(new_admin)
-    db.session.commit()
-
-    return f"Admin user '{username}' created successfully. DELETE this route now for security!"
 # ------------------ RUN APP ------------------------
     
 if __name__ == '__main__':
