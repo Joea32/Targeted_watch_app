@@ -1026,7 +1026,7 @@ def unban_user_api():
     user = User.query.filter_by(username=username).first()
     if not user:
         return jsonify({"error": "User not found."}), 404
-
+        
     user.is_banned = False
     db.session.commit()
     return jsonify({"message": f"{username} has been unbanned."})
@@ -1038,7 +1038,6 @@ def create_tables():
     return "Tables created or already exist."
 
 
-
 #from flask import Blueprint
 #from app import db
 #from models import User  # adjust as needed
@@ -1048,8 +1047,6 @@ def run_full_migration():
     from app import db
     db.create_all()
     return "✅ Migration complete!"
-
-migrate_bp = Blueprint('migrate', __name__)
 
 @migrate_bp.route('/run-full-migration', methods=['GET', 'POST'])
 def run_full_migration():
