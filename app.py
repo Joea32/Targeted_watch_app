@@ -31,7 +31,14 @@ from utils import (
 load_dotenv()
 
 # ------------------ App Initialization ------------------
+
+from flask import Flask
+from flask_login import LoginManager
+
 app = Flask(__name__)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 # Load configuration depending on environment
 env = os.environ.get('FLASK_ENV', 'development')
@@ -80,10 +87,10 @@ ALLOWED_EXTENSIONS = {
 # ------------------ Init Extensions ------------------
 from flask_login import LoginManager
 
-db.init_app(app)
-migrate.init_app(app, db)
-mail.init_app(app)
-login_manager = LoginManager(app)
+#db.init_app(app)
+#migrate.init_app(app, db)
+#mail.init_app(app)
+#login_manager = LoginManager(app)
 #login_manager.init_app(app)
 #login_manager.login_view = 'login'
 
