@@ -1019,9 +1019,6 @@ def unban_user_api():
     db.session.commit()
     return jsonify({"message": f"{username} has been unbanned."})
 
-@app.route('/create-admin-form')
-def create_admin_form():
-    return render_template('create_admin.html')
 
 
 
