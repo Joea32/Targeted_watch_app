@@ -1031,50 +1031,11 @@ def unban_user_api():
     db.session.commit()
     return jsonify({"message": f"{username} has been unbanned."})
 
-#@app.route('/create-tables')
-#def create_tables():
-#    with app.app_context():
-#        db.create_all()
-#    return "Tables created or already exist."
-
-
-#from flask import Blueprint
-#from app import db
-#from models import User  # adjust as needed
-
-@app.route('/create-tables', methods=['GET', 'POST'])
-def create_tables_route():  # Unique function name
-    try:
+@app.route('/create-tables')
+def create_tables():
+    with app.app_context():
         db.create_all()
-        return "Tables created successfully!"
-    except Exception as e:
-        return f"Error creating tables: {e}"
-
-@app.route('/add-columns', methods=['GET', 'POST'])
-def add_columns_to_users_route():  # Unique function name
-    with db.engine.connect() as connection:
-        column_list = [
-            "last_checkin", "checkin_count", "proof_upload_count", "community_votes_count",
-            "score", "trust_points", "trust_score", "_bio", "profile_pic", "badge", "trusted",
-            "is_banned", "is_admin", "trust_level", "negative_action_count", "warnings_count",
-            "negative_marks", "proof_file", "last_checkin_photo", "user_type",
-            "is_verified_supporter", "_supporter_id_proof", "verification_status", "verified"
-        ]
-
-        for column in column_list:
-            try:
-                connection.execute(f'ALTER TABLE users ADD COLUMN {column} TEXT')
-            except Exception as e:
-                print(f"Could not add column '{column}': {e}")
-                pass
-
-    return 'Manual column migration done!', 200
-
-@app.route('/reset-db')
-def reset_db():
-    db.create_all()
-    return "Fresh database created!"
-
+    return "Tables created successfully!"
 
 # ------------------ RUN APP ------------------------
     
