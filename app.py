@@ -272,6 +272,8 @@ def register():
     print("[register] GET request - showing register page")
     return render_template('register.html', recaptcha_site_key=app.config['RECAPTCHA_SITE_KEY'])
 
+from werkzeug.security import check_password_hash, generate_password_hash
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -284,9 +286,9 @@ def login():
         ).first()
 
         if user:
-            # If your passwords are bcrypt hashed (recommended)
-            if user.password.startswith('$2'):  # bcrypt hash prefix
-                if check_password(password, user.password):
+            # Check if password is hashed with Werkzeug (common prefixes)
+            if user.password.startswith('pbkdf2:') or user.password.startswith('sha256$'):
+                if check_password_hash(user.password, password):
                     login_user(user)
                     flash("Login successful.", "success")
                     return redirect(url_for('dashboard'))
@@ -294,16 +296,17 @@ def login():
                 # Legacy plain text password (not recommended)
                 if user.password == password:
                     # Upgrade password hash
-                    user.password = hash_password(password)
+                    user.password = generate_password_hash(password)
                     db.session.commit()
                     login_user(user)
                     flash("Login successful. Password security upgraded.", "success")
                     return redirect(url_for('dashboard'))
 
+        # If we reach here, login failed
         flash("Invalid username/email or password.", "danger")
 
     return render_template('login.html')
-
+    
 @app.route('/logout')
 def logout():
     session.clear()
