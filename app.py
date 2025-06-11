@@ -1037,62 +1037,28 @@ def create_tables():
         db.create_all()
     return "Tables created or already exist."
 
-@app.route('/')
-def home():
-    return "Hello! Use /migrate to add missing columns."
+from flask import Blueprint
+from app import db
+from models import User  # adjust as needed
 
-from sqlalchemy import inspect
+migrate_bp = Blueprint('migrate', __name__)
 
-@app.route('/migrate')
-def migrate():
-    try:
-        inspector = inspect(db.engine)
-        columns = [col['name'] for col in inspector.get_columns('users')]
+@migrate_bp.route('/run-full-migration', methods=['POST'])
+def run_full_migration():
+    with db.engine.connect() as connection:
+        for column in [
+            "last_checkin", "checkin_count", "proof_upload_count", "community_votes_count",
+            "score", "trust_points", "trust_score", "_bio", "profile_pic", "badge", "trusted",
+            "is_banned", "is_admin", "trust_level", "negative_action_count", "warnings_count",
+            "negative_marks", "proof_file", "last_checkin_photo", "user_type",
+            "is_verified_supporter", "_supporter_id_proof", "verification_status", "verified"
+        ]:
+            try:
+                connection.execute(f'ALTER TABLE users ADD COLUMN {column} TEXT')
+            except Exception:
+                pass  # already exists
+    return 'Migration done', 200
 
-        with db.engine.connect() as con:
-            if 'score' not in columns:
-                con.execute("ALTER TABLE users ADD COLUMN score INTEGER DEFAULT 0;")
-            if 'trust_points' not in columns:
-                con.execute("ALTER TABLE users ADD COLUMN trust_points INTEGER DEFAULT 0;")
-            if 'trust_score' not in columns:
-                con.execute("ALTER TABLE users ADD COLUMN trust_score FLOAT DEFAULT 0.0;")
-            if 'checkin_count' not in columns:
-                con.execute("ALTER TABLE users ADD COLUMN checkin_count INTEGER DEFAULT 0;")
-            if 'proof_upload_count' not in columns:
-                con.execute("ALTER TABLE users ADD COLUMN proof_upload_count INTEGER DEFAULT 0;")
-            if 'community_votes_count' not in columns:
-                con.execute("ALTER TABLE users ADD COLUMN community_votes_count INTEGER DEFAULT 0;")
-            if 'badge' not in columns:
-                con.execute("ALTER TABLE users ADD COLUMN badge VARCHAR(50) DEFAULT 'New/Unverified';")
-            if 'trusted' not in columns:
-                con.execute("ALTER TABLE users ADD COLUMN trusted BOOLEAN DEFAULT FALSE;")
-            if 'is_banned' not in columns:
-                con.execute("ALTER TABLE users ADD COLUMN is_banned BOOLEAN DEFAULT FALSE;")
-            if 'is_admin' not in columns:
-                con.execute("ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE;")
-            if 'trust_level' not in columns:
-                con.execute("ALTER TABLE users ADD COLUMN trust_level VARCHAR(50) DEFAULT 'New/Unverified';")
-            if 'negative_action_count' not in columns:
-                con.execute("ALTER TABLE users ADD COLUMN negative_action_count INTEGER DEFAULT 0;")
-            if 'warnings_count' not in columns:
-                con.execute("ALTER TABLE users ADD COLUMN warnings_count INTEGER DEFAULT 0;")
-            if 'negative_marks' not in columns:
-                con.execute("ALTER TABLE users ADD COLUMN negative_marks INTEGER DEFAULT 0;")
-            if 'user_type' not in columns:
-                con.execute("ALTER TABLE users ADD COLUMN user_type VARCHAR(50) DEFAULT 'victim' NOT NULL;")
-            if 'is_verified_supporter' not in columns:
-                con.execute("ALTER TABLE users ADD COLUMN is_verified_supporter BOOLEAN DEFAULT FALSE;")
-            if 'verification_status' not in columns:
-                con.execute("ALTER TABLE users ADD COLUMN verification_status VARCHAR(50) DEFAULT 'unverified';")
-            if 'verified' not in columns:
-                con.execute("ALTER TABLE users ADD COLUMN verified BOOLEAN DEFAULT FALSE;")
-
-        return "Migration successful: Missing columns added."
-    except Exception as e:
-        return f"Migration error: {str(e)}", 500
-
-with app.app_context():
-    db.create_all()
 
 # ------------------ RUN APP ------------------------
     
