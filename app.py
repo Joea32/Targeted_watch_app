@@ -1047,13 +1047,11 @@ def create_initial_admin_two():
 
 @app.route('/create-initial-admin', methods=['GET', 'POST'])
 def create_initial_admin():
-    secret_key = request.args.get('key')
-    if secret_key != 'Fedfnewfnwfgwbi23dqq':
-        abort(403)
-
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        print(f"Received username: {username}")  # debug
+        print(f"Received password: {'***' if password else None}")  # don't print password raw
 
         if not username or not password:
             return "Username and password required.", 400
@@ -1062,6 +1060,7 @@ def create_initial_admin():
             return "User already exists.", 400
 
         hashed_password = generate_password_hash(password)
+        print("Password hashed")
 
         new_admin = User(
             name="Admin User",
@@ -1071,8 +1070,13 @@ def create_initial_admin():
             is_admin=True
         )
 
-        db.session.add(new_admin)
-        db.session.commit()
+        try:
+            db.session.add(new_admin)
+            db.session.commit()
+            print("Admin user added to DB")
+        except Exception as e:
+            print(f"DB commit failed: {e}")
+            return f"Error: {e}", 500
 
         return redirect(url_for('login'))
 
