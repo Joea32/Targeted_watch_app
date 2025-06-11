@@ -1042,13 +1042,13 @@ def create_tables():
 #from app import db
 #from models import User  # adjust as needed
 
-@migrate_bp.route('/run-full-migration', methods=['GET', 'POST'])
+@app.route('/run-full-migration', methods=['GET', 'POST'])
 def run_full_migration():
     from app import db
     db.create_all()
     return "✅ Migration complete!"
 
-@migrate_bp.route('/run-full-migration', methods=['GET', 'POST'])
+@app.route('/run-full-migration', methods=['GET', 'POST'])
 def run_full_migration():
     with db.engine.connect() as connection:
         for column in [
@@ -1061,7 +1061,7 @@ def run_full_migration():
             try:
                 connection.execute(f'ALTER TABLE users ADD COLUMN {column} TEXT')
             except Exception:
-                pass  # already exists
+                pass  # column already exists, ignore error
     return 'Migration done', 200
 
 
