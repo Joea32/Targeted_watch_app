@@ -1122,7 +1122,15 @@ def login_test():
     </form>
     '''
 
-from werkzeug.security import check_password_hash, generate_password_hash
+
+
+from passlib.context import CryptContext
+
+# Setup passlib context with bcrypt and scrypt support
+pwd_context = CryptContext(
+    schemes=["bcrypt", "scrypt", "pbkdf2_sha256"],
+    deprecated="auto"
+)
 
 @app.route('/login_logic_test_2', methods=['GET', 'POST'])
 def login_logic_test_2():
@@ -1140,9 +1148,9 @@ def login_logic_test_2():
 
         pw = user.password
 
-        # Werkzeug hashes
-        if pw.startswith('pbkdf2:') or pw.startswith('sha256$'):
-            if check_password_hash(pw, password):
+        # Use passlib to verify password (supports bcrypt, scrypt, pbkdf2_sha256)
+        if pwd_context.identify(pw):
+            if pwd_context.verify(password, pw):
                 login_user(user)
                 flash("Login successful.", "success")
                 return redirect(url_for('dashboard'))
@@ -1150,15 +1158,14 @@ def login_logic_test_2():
                 flash("Invalid username/email or password.", "danger")
                 return render_template('login.html')
 
-        # Legacy plain text password (upgrade)
+        # Legacy plain text password (upgrade to passlib hash)
         elif pw == password:
-            user.password = generate_password_hash(password)
+            user.password = pwd_context.hash(password)
             db.session.commit()
             login_user(user)
             flash("Login successful. Password security upgraded.", "success")
             return redirect(url_for('dashboard'))
 
-        # Unsupported hash (e.g., scrypt)
         else:
             flash("Password uses unsupported hash. Please reset your password.", "warning")
             return render_template('login.html')
