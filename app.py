@@ -1040,54 +1040,6 @@ def create_initial_admin():
     # GET request shows the form
     return render_template("create_admin.html")  # your existing form template
 
-@app.route("/create-admin")
-def create_admin():
-    # Protect the route with a simple password token
-    token = request.args.get("token")
-    if token != "ATUE_ChangePw_#2024!secureTOKEN":
-        abort(403)  # Forbidden
-
-    # Check if admin already exists
-    existing_admin = User.query.filter_by(username="Atueman31").first()
-    if existing_admin:
-        return "Admin already exists."
-
-    password = "Atueman31"  # TEMPORARY — change it before deploying
-    hashed_password = generate_password_hash(password)
-
-    admin = User(
-        name="Admin User",
-        username="Atueman31",
-        email=None,
-        password=hashed_password,
-        is_admin=True,
-    )
-
-    db.session.add(admin)
-    db.session.commit()
-    return "Admin user created!"
-
-@app.route("/change-admin-password", methods=["POST"])
-def change_admin_password():
-    token = request.args.get("token")
-    if token != "ATUE_ChangePw_#2024!secureTOKEN":
-        abort(403)
-
-    new_password = request.form.get("password")
-    if not new_password:
-        return "Missing password.", 400
-
-    admin = User.query.filter_by(username="Atueman31").first()
-    if not admin:
-        return "Admin user not found.", 404
-
-    admin.password = generate_password_hash(new_password)
-    db.session.commit()
-    return "Admin password changed successfully!"
-
-
-
-
 # ------------------ RUN APP ------------------------
     
 if __name__ == '__main__':
