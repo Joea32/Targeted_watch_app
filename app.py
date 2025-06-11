@@ -1032,9 +1032,11 @@ def create_initial_admin():
         new_admin = User(username=username, password=hashed_password, is_admin=True)
         db.session.add(new_admin)
         db.session.commit()
-        return "Admin created successfully. Now delete this route!", 201
+        
+        # Redirect to login or wherever after creation
+        return redirect(url_for('login'))  # or 'auth.login' if your login route is in the auth blueprint
 
-    return render_template("create_admin.html")  # or your correct HTML file
+    return render_template("create_admin.html")
 
 
 
