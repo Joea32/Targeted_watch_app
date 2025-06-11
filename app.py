@@ -1048,6 +1048,10 @@ def create_initial_admin_two():
 #from yourapp import app, db
 #from yourapp.models import User
 
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 @app.route('/create-initial-admin', methods=['GET', 'POST'])
 def create_initial_admin():
     if request.method == 'POST':
@@ -1062,8 +1066,9 @@ def create_initial_admin():
         if User.query.filter_by(username=username).first():
             return "User already exists.", 400
 
-        hashed_password = generate_password_hash(password)
-        print("Password hashed")
+        # Hash password using Passlib (bcrypt)
+        hashed_password = pwd_context.hash(password)
+        print("Password hashed with bcrypt")
 
         new_admin = User(
             name="Admin User",
