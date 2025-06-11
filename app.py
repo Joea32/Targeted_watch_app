@@ -1036,7 +1036,7 @@ def create_initial_admin():
         # Redirect to login or wherever after creation
         return redirect(url_for('login'))  # or 'auth.login' if your login route is in the auth blueprint
 
-    return render_template("create_admin.html")
+    return render_template("create_initial_admin.html")
 
 
 
