@@ -1040,6 +1040,67 @@ def create_initial_admin():
     # GET request shows the form
     return render_template("create_admin.html")  # your existing form template
 
+#from flask import request, abort, redirect, url_for, render_template
+#from werkzeug.security import generate_password_hash
+#from yourapp import app, db
+#from yourapp.models import User
+
+@app.route('/create-initial-admin', methods=['GET', 'POST'])
+def create_initial_admin():
+    secret_key = request.args.get('key')
+    if secret_key != 'Asdfert2345ghyuihef':
+        abort(403)
+
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        if not username or not password:
+            return "Username and password required.", 400
+
+        if User.query.filter_by(username=username).first():
+            return "User already exists.", 400
+
+        hashed_password = generate_password_hash(password)
+
+        new_admin = User(
+            name="Admin User",
+            username=username,
+            email=None,                # nullable
+            password=hashed_password,
+            badge="New/Unverified",    # default in model but explicit here for clarity
+            trusted=False,
+            is_banned=False,
+            is_admin=True,             # make admin!
+            trust_level="New/Unverified",
+            user_type="victim",        # default
+            verification_status="unverified",  # default
+            verified=False,
+            checkin_count=0,
+            proof_upload_count=0,
+            community_votes_count=0,
+            score=0,
+            trust_points=0,
+            trust_score=0.0,
+            negative_action_count=0,
+            warnings_count=0,
+            negative_marks=0,
+            last_checkin=None,
+            _bio=None,
+            profile_pic=None,
+            proof_file=None,
+            last_checkin_photo=None,
+            is_verified_supporter=False,
+            _supporter_id_proof=None,
+        )
+
+        db.session.add(new_admin)
+        db.session.commit()
+
+        return redirect(url_for('login'))
+
+    return render_template('create_admin.html')
+
 # ------------------ RUN APP ------------------------
     
 if __name__ == '__main__':
