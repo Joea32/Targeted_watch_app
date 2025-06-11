@@ -273,6 +273,13 @@ def register():
     return render_template('register.html', recaptcha_site_key=app.config['RECAPTCHA_SITE_KEY'])
 
 from werkzeug.security import check_password_hash, generate_password_hash
+from passlib.context import CryptContext
+
+# Setup passlib context with bcrypt and scrypt support
+pwd_context = CryptContext(
+    schemes=["bcrypt", "scrypt", "pbkdf2_sha256"],
+    deprecated="auto"
+)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -280,30 +287,37 @@ def login():
         user_input = request.form.get('username_or_email', '').strip()
         password = request.form.get('password', '')
 
-        # Query user by username or email
         user = User.query.filter(
             (User.username == user_input) | (User.email == user_input)
         ).first()
 
-        if user:
-            # Check if password is hashed with Werkzeug (common prefixes)
-            if user.password.startswith('pbkdf2:') or user.password.startswith('sha256$'):
-                if check_password_hash(user.password, password):
-                    login_user(user)
-                    flash("Login successful.", "success")
-                    return redirect(url_for('dashboard'))
-            else:
-                # Legacy plain text password (not recommended)
-                if user.password == password:
-                    # Upgrade password hash
-                    user.password = generate_password_hash(password)
-                    db.session.commit()
-                    login_user(user)
-                    flash("Login successful. Password security upgraded.", "success")
-                    return redirect(url_for('dashboard'))
+        if not user:
+            flash("User not found.", "danger")
+            return render_template('login.html')
 
-        # If we reach here, login failed
-        flash("Invalid username/email or password.", "danger")
+        pw = user.password
+
+        # Use passlib to verify password (supports bcrypt, scrypt, pbkdf2_sha256)
+        if pwd_context.identify(pw):
+            if pwd_context.verify(password, pw):
+                login_user(user)
+                flash("Login successful.", "success")
+                return redirect(url_for('dashboard'))
+            else:
+                flash("Invalid username/email or password.", "danger")
+                return render_template('login.html')
+
+        # Legacy plain text password (upgrade to passlib hash)
+        elif pw == password:
+            user.password = pwd_context.hash(password)
+            db.session.commit()
+            login_user(user)
+            flash("Login successful. Password security upgraded.", "success")
+            return redirect(url_for('dashboard'))
+
+        else:
+            flash("Password uses unsupported hash. Please reset your password.", "warning")
+            return render_template('login.html')
 
     return render_template('login.html')
     
@@ -1129,53 +1143,8 @@ def login_test():
 
 
 
-from passlib.context import CryptContext
 
-# Setup passlib context with bcrypt and scrypt support
-pwd_context = CryptContext(
-    schemes=["bcrypt", "scrypt", "pbkdf2_sha256"],
-    deprecated="auto"
-)
 
-@app.route('/login_logic_test_2', methods=['GET', 'POST'])
-def login_logic_test_2():
-    if request.method == 'POST':
-        user_input = request.form.get('username_or_email', '').strip()
-        password = request.form.get('password', '')
-
-        user = User.query.filter(
-            (User.username == user_input) | (User.email == user_input)
-        ).first()
-
-        if not user:
-            flash("User not found.", "danger")
-            return render_template('login.html')
-
-        pw = user.password
-
-        # Use passlib to verify password (supports bcrypt, scrypt, pbkdf2_sha256)
-        if pwd_context.identify(pw):
-            if pwd_context.verify(password, pw):
-                login_user(user)
-                flash("Login successful.", "success")
-                return redirect(url_for('dashboard'))
-            else:
-                flash("Invalid username/email or password.", "danger")
-                return render_template('login.html')
-
-        # Legacy plain text password (upgrade to passlib hash)
-        elif pw == password:
-            user.password = pwd_context.hash(password)
-            db.session.commit()
-            login_user(user)
-            flash("Login successful. Password security upgraded.", "success")
-            return redirect(url_for('dashboard'))
-
-        else:
-            flash("Password uses unsupported hash. Please reset your password.", "warning")
-            return render_template('login.html')
-
-    return render_template('login.html')
 
 #from flask import request
 #from werkzeug.security import generate_password_hash
