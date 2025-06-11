@@ -1070,6 +1070,11 @@ def add_columns_to_users_route():  # Unique function name
 
     return 'Manual column migration done!', 200
 
+@app.route('/reset-db')
+def reset_db():
+    db.create_all()
+    return "Fresh database created!"
+
 
 # ------------------ RUN APP ------------------------
     
