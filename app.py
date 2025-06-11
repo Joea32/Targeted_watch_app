@@ -1047,9 +1047,9 @@ def create_initial_admin_two():
 
 @app.route('/create-initial-admin', methods=['GET', 'POST'])
 def create_initial_admin():
-    secret_key = request.args.get('key')
-    if secret_key != 'Asdfert2345ghyuihef':
-        abort(403)
+    #secret_key = request.args.get('key')
+    #if secret_key != 'Asdfert2345ghyuihef':
+    #    abort(403)
 
     if request.method == 'POST':
         username = request.form.get('username')
