@@ -1019,6 +1019,23 @@ def unban_user_api():
     db.session.commit()
     return jsonify({"message": f"{username} has been unbanned."})
 
+@app.route('/create-initial-admin', methods=['GET', 'POST'])
+def create_initial_admin():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        if User.query.filter_by(username=username).first():
+            return "User already exists.", 400
+
+        hashed_password = generate_password_hash(password)
+        new_admin = User(username=username, password=hashed_password, is_admin=True)
+        db.session.add(new_admin)
+        db.session.commit()
+        return "Admin created successfully. Now delete this route!", 201
+
+    return render_template("create_admin.html")
+
 
 
 
