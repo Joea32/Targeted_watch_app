@@ -1020,8 +1020,8 @@ def unban_user_api():
     db.session.commit()
     return jsonify({"message": f"{username} has been unbanned."})
 
-@app.route('/create-initial-admin', methods=['GET', 'POST'])
-def create_initial_admin():
+@app.route('/create-initial-admin-two', methods=['GET', 'POST'])
+def create_initial_admin_two():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
