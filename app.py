@@ -1122,6 +1122,49 @@ def login_test():
     </form>
     '''
 
+from werkzeug.security import check_password_hash, generate_password_hash
+
+@app.route('/login_logic_test_2', methods=['GET', 'POST'])
+def login_logic_test_2():
+    if request.method == 'POST':
+        user_input = request.form.get('username_or_email', '').strip()
+        password = request.form.get('password', '')
+
+        user = User.query.filter(
+            (User.username == user_input) | (User.email == user_input)
+        ).first()
+
+        if not user:
+            flash("User not found.", "danger")
+            return render_template('login.html')
+
+        pw = user.password
+
+        # Werkzeug hashes
+        if pw.startswith('pbkdf2:') or pw.startswith('sha256$'):
+            if check_password_hash(pw, password):
+                login_user(user)
+                flash("Login successful.", "success")
+                return redirect(url_for('dashboard'))
+            else:
+                flash("Invalid username/email or password.", "danger")
+                return render_template('login.html')
+
+        # Legacy plain text password (upgrade)
+        elif pw == password:
+            user.password = generate_password_hash(password)
+            db.session.commit()
+            login_user(user)
+            flash("Login successful. Password security upgraded.", "success")
+            return redirect(url_for('dashboard'))
+
+        # Unsupported hash (e.g., scrypt)
+        else:
+            flash("Password uses unsupported hash. Please reset your password.", "warning")
+            return render_template('login.html')
+
+    return render_template('login.html')
+
 # ------------------ RUN APP ------------------------
     
 if __name__ == '__main__':
