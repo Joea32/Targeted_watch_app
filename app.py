@@ -1087,6 +1087,38 @@ def list_users():
     users = User.query.all()
     return "<br>".join([f"{u.username} (admin: {u.is_admin})" for u in users])
 
+from werkzeug.security import check_password_hash, generate_password_hash
+from flask import flash, redirect, render_template, request, url_for
+from flask_login import login_user
+
+@app.route('/login_test', methods=['GET', 'POST'])
+def login_test():
+    if request.method == 'POST':
+        user_input = request.form.get('username_or_email', '').strip()
+        password = request.form.get('password', '')
+
+        user = User.query.filter(
+            (User.username == user_input) | (User.email == user_input)
+        ).first()
+
+        if user:
+            if user.password.startswith('$pbkdf2:') or user.password.startswith('$2'):
+                if check_password_hash(user.password, password):
+                    login_user(user)
+                    flash("Login successful.", "success")
+                    return redirect(url_for('dashboard'))
+            else:
+                if user.password == password:
+                    user.password = generate_password_hash(password)
+                    db.session.commit()
+                    login_user(user)
+                    flash("Login successful. Password security upgraded.", "success")
+                    return redirect(url_for('dashboard'))
+
+        flash("Invalid username/email or password.", "danger")
+
+    return render_template('login.html')
+
 # ------------------ RUN APP ------------------------
     
 if __name__ == '__main__':
