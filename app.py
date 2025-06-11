@@ -1078,6 +1078,11 @@ def create_initial_admin():
 
     return render_template('create_admin.html')
 
+@app.route('/list-users')
+def list_users():
+    users = User.query.all()
+    return "<br>".join([f"{u.username} (admin: {u.is_admin})" for u in users])
+
 # ------------------ RUN APP ------------------------
     
 if __name__ == '__main__':
