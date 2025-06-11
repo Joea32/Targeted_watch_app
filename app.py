@@ -1033,11 +1033,7 @@ def unban_user_api():
     db.session.commit()
     return jsonify({"message": f"{username} has been unbanned."})
 
-@app.route('/create-tables')
-def create_tables():
-    with app.app_context():
-        db.create_all()
-    return "Tables created successfully!"
+
 
 # ------------------ RUN APP ------------------------
     
