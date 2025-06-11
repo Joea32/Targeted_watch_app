@@ -1037,9 +1037,17 @@ def create_tables():
         db.create_all()
     return "Tables created or already exist."
 
-from flask import Blueprint
-from app import db
-from models import User  # adjust as needed
+
+
+#from flask import Blueprint
+#from app import db
+#from models import User  # adjust as needed
+
+@migrate_bp.route('/run-full-migration', methods=['GET', 'POST'])
+def run_full_migration():
+    from app import db
+    db.create_all()
+    return "✅ Migration complete!"
 
 migrate_bp = Blueprint('migrate', __name__)
 
