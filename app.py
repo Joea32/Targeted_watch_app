@@ -969,10 +969,10 @@ def reset_password():
     return redirect(url_for('admin_users'))
 
 # --- Optional: Create new admin user (admin only) ---
-@app.route('/admin/create-admin', methods=['POST'])
+@app.route('/admin/create-admin-second', methods=['POST'])
 @login_required
 @admin_required
-def create_admin():
+def create_admin_second():
     username = request.form.get('username')
     password = request.form.get('password')
 
