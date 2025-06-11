@@ -1,7 +1,7 @@
 # ------------------ Standard Library ------------------
 import os
 import uuid
-from datetime import timedelta
+from datetime import datetime, timedelta
 from functools import wraps
 
 # ------------------ Third-party Imports ------------------
@@ -9,14 +9,17 @@ from flask import (
     Flask, render_template, redirect, url_for,
     request, session, flash, abort, jsonify, send_from_directory
 )
-from flask_login import login_user, login_required, current_user
-from dotenv import load_dotenv
+from flask_login import (
+    LoginManager, login_user, login_required, current_user
+)
+from flask_migrate import upgrade
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
+from dotenv import load_dotenv
 from whitenoise import WhiteNoise
-from extensions import db, migrate, mail, login_manager
 
 # ------------------ Local Imports ------------------
+from extensions import db, migrate, mail, login_manager
 from models import User
 from auth_routes import auth as auth_blueprint
 from logging_config import setup_logging
@@ -26,6 +29,7 @@ from utils import (
     update_user_verification, user_check_in,
     user_receive_vote, save_file, update_trust_level
 )
+from token_utils import confirm_token
 
 # ------------------ Load Environment ------------------
 load_dotenv()
@@ -33,25 +37,22 @@ load_dotenv()
 # ------------------ App Initialization ------------------
 app = Flask(__name__)
 
-# Load configuration depending on environment
+# Load config based on environment
 env = os.environ.get('FLASK_ENV', 'development')
 if env == 'production':
     app.config.from_object('config.ProductionConfig')
 else:
     app.config.from_object('config.DevelopmentConfig')
 
-# Secret Key
 app.secret_key = app.config['SECRET_KEY']
 
 # ------------------ Static and Upload Folder Config ------------------
 basedir = os.path.abspath(os.path.dirname(__file__))
-
 app.config['UPLOAD_FOLDER'] = os.path.join(basedir, 'static', 'uploads')
 app.config['UPLOAD_FOLDER_PROFILE'] = os.path.join(basedir, 'static', 'profiles')
 app.config['UPLOAD_FOLDER_PROOF'] = os.path.join(basedir, 'static', 'proofs')
 app.config['UPLOAD_FOLDER_CHECKIN'] = os.path.join(basedir, 'static', 'checkins')
 
-# Ensure folders exist
 for folder in [
     app.config['UPLOAD_FOLDER'],
     app.config['UPLOAD_FOLDER_PROFILE'],
@@ -60,7 +61,7 @@ for folder in [
 ]:
     os.makedirs(folder, exist_ok=True)
 
-# ------------------ WhiteNoise and WSGI Middleware ------------------
+# ------------------ Middleware ------------------
 app.wsgi_app = WhiteNoise(app.wsgi_app, root='static/', prefix='static/')
 
 # ------------------ App Config ------------------
@@ -71,29 +72,17 @@ app.config['RECAPTCHA_SECRET_KEY'] = os.getenv('RECAPTCHA_SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# ------------------ Allowed Upload Extensions ------------------
 ALLOWED_EXTENSIONS = {
     'png', 'jpg', 'jpeg', 'gif', 'pdf',
     'mp4', 'mov', 'avi', 'mkv', 'mp3', 'wav', 'webm'
 }
 
 # ------------------ Init Extensions ------------------
-#from flask_login import LoginManager
-
-from extensions import db, migrate, mail, login_manager
-
-#db.init_app(app)
-#migrate.init_app(app, db)
-#mail.init_app(app)
-#login_manager = LoginManager(app)
-#login_manager.init_app(app)
-#login_manager.login_view = 'login'
-
 db.init_app(app)
 migrate.init_app(app, db)
 mail.init_app(app)
 login_manager.init_app(app)
-login_manager.login_view = 'auth.login'  # adjust if your login view is different
+login_manager.login_view = 'auth.login'
 
 # ------------------ Flask-Login User Loader ------------------
 @login_manager.user_loader
@@ -191,7 +180,7 @@ import requests
 
 from utils import verify_captcha  # Add this import
 
-import os
+#import os
 
 @app.route('/register', methods=['GET', 'POST'])
 def register(): 
@@ -307,7 +296,7 @@ def logout():
 
 # ----------- DASHBOARD & USER INTERACTIONS ---------
 
-from flask_login import current_user
+#from flask_login import current_user
 
 @app.route('/dashboard')
 @login_required
@@ -358,15 +347,6 @@ def dashboard():
         profiles_info=profiles_info
     )
 
-from flask_login import current_user
-from flask import request, redirect, url_for, flash, render_template
-from datetime import datetime
-
-
-from datetime import datetime
-from flask import flash, redirect, url_for, render_template, request
-from flask_login import login_required, current_user
-from utils import save_file, update_trust_level
 
 @app.route('/checkin', methods=['GET', 'POST'])
 @login_required
@@ -745,10 +725,7 @@ def reset_password_token(token):
 
     return render_template('reset_password_form.html')
 
-from flask import Blueprint, flash, redirect, url_for
-from extensions import db
-from models import User
-from token_utils import confirm_token
+
 
 auth = Blueprint('auth', __name__)
 
@@ -898,7 +875,7 @@ def confirm_email(token):
 #    except Exception as e:
 #        return f"Error creating tables: {e}"
 
-from flask_migrate import upgrade
+
 
 @app.route('/run-migrations')
 def run_migrations():
@@ -910,23 +887,23 @@ def run_migrations():
 
 ######
 
-from flask import abort
-from flask_login import current_user
+#from flask import abort
+#from flask_login import current_user
 
 #@app.before_request
 #def block_banned_users():
 #    if current_user.is_authenticated and getattr(current_user, 'is_banned', False):
 #        abort(403)  # Forbidden access; optionally redirect to a "banned" page
 
-from flask import (
-    Flask, render_template, redirect, url_for, request, flash, abort, jsonify
-)
-from flask_login import login_required, current_user
-from werkzeug.security import generate_password_hash
-from models import User, db
-from utils import admin_required  # assuming you have this decorator
+#from flask import (
+#    Flask, render_template, redirect, url_for, request, flash, abort, jsonify
+#)
+#from flask_login import login_required, current_user
+#from werkzeug.security import generate_password_hash
+#from models import User, db
+#from utils import admin_required  # assuming you have this decorator
 
-app = Flask(__name__)
+#app = Flask(__name__)
 
 # --- Block banned users (non-admins) from accessing any route ---
 @app.before_request
