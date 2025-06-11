@@ -1042,27 +1042,35 @@ def create_tables():
 #from app import db
 #from models import User  # adjust as needed
 
-@app.route('/run-full-migration', methods=['GET', 'POST'])
-def run_full_migration():
-    from app import db
-    db.create_all()
-    return "✅ Migration complete!"
+#  Route to create all tables
+@app.route('/create-tables', methods=['GET', 'POST'])
+def create_tables():
+    try:
+        db.create_all()
+        return " Tables created successfully!"
+    except Exception as e:
+        return f" Error creating tables: {e}"
 
-@app.route('/run-full-migration', methods=['GET', 'POST'])
-def run_full_migration():
+#  Route to manually add columns to the 'users' table
+@app.route('/add-columns', methods=['GET', 'POST'])
+def add_columns_to_users():
     with db.engine.connect() as connection:
-        for column in [
+        column_list = [
             "last_checkin", "checkin_count", "proof_upload_count", "community_votes_count",
             "score", "trust_points", "trust_score", "_bio", "profile_pic", "badge", "trusted",
             "is_banned", "is_admin", "trust_level", "negative_action_count", "warnings_count",
             "negative_marks", "proof_file", "last_checkin_photo", "user_type",
             "is_verified_supporter", "_supporter_id_proof", "verification_status", "verified"
-        ]:
+        ]
+
+        for column in column_list:
             try:
                 connection.execute(f'ALTER TABLE users ADD COLUMN {column} TEXT')
-            except Exception:
-                pass  # column already exists, ignore error
-    return 'Migration done', 200
+            except Exception as e:
+                print(f" Could not add column '{column}': {e}")
+                pass  # Ignore if the column already exists or fails
+
+    return 'Manual column migration done!', 200
 
 
 # ------------------ RUN APP ------------------------
