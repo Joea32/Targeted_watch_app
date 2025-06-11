@@ -1034,7 +1034,7 @@ def create_initial_admin():
         db.session.commit()
         return "Admin created successfully. Now delete this route!", 201
 
-    return render_template("create_initial_admin.html")  # or your correct HTML file
+    return render_template("create_admin.html")  # or your correct HTML file
 
 
 
