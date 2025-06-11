@@ -1087,9 +1087,6 @@ def list_users():
     users = User.query.all()
     return "<br>".join([f"{u.username} (admin: {u.is_admin})" for u in users])
 
-from werkzeug.security import check_password_hash, generate_password_hash
-from flask import flash, redirect, render_template, request, url_for
-from flask_login import login_user
 
 @app.route('/login_test', methods=['GET', 'POST'])
 def login_test():
@@ -1101,23 +1098,26 @@ def login_test():
             (User.username == user_input) | (User.email == user_input)
         ).first()
 
-        if user:
-            if user.password.startswith('$pbkdf2:') or user.password.startswith('$2'):
-                if check_password_hash(user.password, password):
-                    login_user(user)
-                    flash("Login successful.", "success")
-                    return redirect(url_for('dashboard'))
-            else:
-                if user.password == password:
-                    user.password = generate_password_hash(password)
-                    db.session.commit()
-                    login_user(user)
-                    flash("Login successful. Password security upgraded.", "success")
-                    return redirect(url_for('dashboard'))
+        if not user:
+            return "User not found."
 
-        flash("Invalid username/email or password.", "danger")
+        from werkzeug.security import check_password_hash
 
-    return render_template('login.html')
+        # Show password hash in logs for debugging (remove this after test!)
+        print(f"User password hash: {user.password}")
+
+        if check_password_hash(user.password, password):
+            return f"Password for user {user.username} matches!"
+        else:
+            return f"Password for user {user.username} does NOT match."
+
+    return '''
+    <form method="post">
+        Username or Email: <input name="username_or_email" type="text" />
+        Password: <input name="password" type="password" />
+        <input type="submit" />
+    </form>
+    '''
 
 # ------------------ RUN APP ------------------------
     
