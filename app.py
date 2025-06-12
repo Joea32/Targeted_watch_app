@@ -258,7 +258,7 @@ def register():
         print(f"[register] New user created with email: {new_user.email}")
 
         token = generate_token(new_user.email)
-        confirm_url = url_for('auth.confirm_email', token=token, _external=True)
+        confirm_url = url_for('confirm_email', token=token, _external=True)
         html = render_template('activate.html', confirm_url=confirm_url)
         subject = "Please confirm your email"
 
