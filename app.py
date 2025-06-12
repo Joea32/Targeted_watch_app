@@ -33,7 +33,7 @@ from utils import (
 )
 from token_utils import confirm_token
 
-from auth import check_password
+#from auth import check_password
 
 # ------------------ Load Environment ------------------
 load_dotenv()
