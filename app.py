@@ -23,7 +23,7 @@ from werkzeug.security import generate_password_hash
 # ------------------ Local Imports ------------------
 from extensions import db, migrate, mail, login_manager
 from models import User
-from auth_routes import auth as auth_blueprint
+#from auth_routes import auth as auth_blueprint
 from logging_config import setup_logging
 from utils import (
     verify_captcha, generate_token, send_email,
