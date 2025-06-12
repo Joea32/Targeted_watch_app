@@ -48,8 +48,8 @@ from werkzeug.exceptions import RequestEntityTooLarge
 app = Flask(__name__)
 
 # ------------------ Blueprint Registration ------------------
-from auth_routes import auth as auth_blueprint
-app.register_blueprint(auth_blueprint, url_prefix='/auth')
+#from auth_routes import auth as auth_blueprint
+#app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
 # Load config based on environment
 env = os.environ.get('FLASK_ENV', 'development')
