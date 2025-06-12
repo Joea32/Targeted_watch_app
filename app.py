@@ -1145,6 +1145,10 @@ def login_test():
 def forbidden(e):
     return render_template('403.html'), 403
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
 
 
 #from flask import request
