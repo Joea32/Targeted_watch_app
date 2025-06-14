@@ -38,3 +38,16 @@ Vision
 	•	Provide a technology-based tool to defend human rights, safety, and justice through collective vigilance.
 
  Welcome contributions and ideas from the community to help improve and grow the project. To keep things positive and on track, please collaborate respectfully and avoid actions that could disrupt the project.
+
+ Privacy & Data Security
+
+Protecting our users is the highest priority. The app is designed with privacy, autonomy, and security at its core:
+	•	No unnecessary data collection: We only collect the minimum information required to provide safety features (e.g., check-ins, alerts).
+	•	User-controlled visibility: You decide what parts of your profile are visible and to whom.
+	•	End-to-end encryption: Sensitive communications and safety check-ins will be secured using industry-standard encryption (under active development).
+	•	Tamper-proof logging (planned): Activity logs will be cryptographically protected to ensure transparency and prevent manipulation.
+	•	No third-party data sharing: We do not share your data with advertisers, corporations, or government entities.
+
+This platform exists to protect, not exploit. As development continues, our privacy policy and technical documentation will expand to offer more clarity. Feedback from the community is welcome as we refine these protections.
+
+⸻
